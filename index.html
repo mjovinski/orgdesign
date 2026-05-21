@@ -4,705 +4,634 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculadora de Design Organizacional</title>
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React & ReactDOM via CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Babel Standalone (transpile JSX in browser) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- SheetJS (xlsx parsing) -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            display: ['Arial', 'sans-serif'],
-            body: ['Arial', 'sans-serif'],
-          },
-          colors: {
-            ink: '#0f0f0f',
-            bone: '#f5f1eb',
-            rust: '#c8401a',
-            sage: '#3a6351',
-            amber: '#d4860a',
-            slate: '#4a5568',
-          }
+          fontFamily: { display: [Arial,'sans-serif'], body: [Arial,'sans-serif'] },
+          colors: { ink:'#0f0f0f', bone:'#f5f1eb', rust:'#c8401a', sage:'#3a6351', amber:'#d4860a' }
         }
       }
     };
   </script>
-
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #f5f1eb;
-      color: #0f0f0f;
-      min-height: 100vh;
-    }
-    h1, h2, h3, h4, .font-display { font-family: 'Arial', sans-serif; }
-
-    .upload-zone {
-      border: 2px dashed #c8401a;
-      transition: all 0.2s ease;
-    }
-    .upload-zone:hover, .upload-zone.drag-over {
-      background: #fff8f5;
-      border-color: #0f0f0f;
-    }
-    .tag {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    .tag-pescoço { background: #fee2e2; color: #991b1b; }
-    .tag-excessivo { background: #fef3c7; color: #92400e; }
-    .tag-reduzido { background: #dbeafe; color: #1e40af; }
-    .tag-individual { background: #f3e8ff; color: #6b21a8; }
-    .tag-ok { background: #d1fae5; color: #065f46; }
-
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      border: 1px solid #e5e0d8;
-    }
-    .card-dark {
-      background: #0f0f0f;
-      border-radius: 12px;
-      padding: 24px;
-      color: #f5f1eb;
-    }
-
-    .section-label {
-      font-family: 'Arial', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #c8401a;
-      margin-bottom: 8px;
-    }
-
-    table { border-collapse: collapse; width: 100%; }
-    th {
-      font-family: 'Arial', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #6b7280;
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 2px solid #e5e0d8;
-    }
-    td {
-      padding: 10px 14px;
-      font-size: 13px;
-      border-bottom: 1px solid #f0ece5;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #faf8f5; }
-
-    .metric-big {
-      font-family: 'Arial', sans-serif;
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1;
-      color: #0f0f0f;
-    }
-    .metric-label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 4px;
-      font-weight: 500;
-    }
-
-    .bar-fill {
-      height: 8px;
-      border-radius: 4px;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .accordion-toggle {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid #e5e0d8;
-      border-top-color: #c8401a;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .fade-in { animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
-
-    .ai-block {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
-      border-radius: 12px;
-      padding: 24px;
-      color: #f5f1eb;
-      position: relative;
-      overflow: hidden;
-    }
-    .ai-block::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 120px; height: 120px;
-      background: radial-gradient(circle, rgba(200,64,26,0.3) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-    .ai-typing::after {
-      content: '▋';
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-
-    details > summary { list-style: none; }
-    details > summary::-webkit-details-marker { display: none; }
+    *{box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:#f5f1eb;color:#0f0f0f;min-height:100vh}
+    h1,h2,h3,h4,.font-display{font-family:Arial,sans-serif}
+    .upload-zone{border:2px dashed #c8401a;transition:all .2s ease}
+    .upload-zone:hover,.upload-zone.drag-over{background:#fff8f5;border-color:#0f0f0f}
+    .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+    .tag-pescoço{background:#fee2e2;color:#991b1b}
+    .tag-excessivo{background:#fef3c7;color:#92400e}
+    .tag-reduzido{background:#dbeafe;color:#1e40af}
+    .tag-individual{background:#f3e8ff;color:#6b21a8}
+    .tag-ok{background:#d1fae5;color:#065f46}
+    .card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e5e0d8}
+    .section-label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#c8401a;margin-bottom:8px}
+    table{border-collapse:collapse;width:100%}
+    th{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;padding:10px 14px;text-align:left;border-bottom:2px solid #e5e0d8}
+    td{padding:10px 14px;font-size:13px;border-bottom:1px solid #f0ece5}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#faf8f5}
+    .metric-big{font-family:Arial,sans-serif;font-size:48px;font-weight:800;line-height:1;color:#0f0f0f}
+    .metric-label{font-size:12px;color:#6b7280;margin-top:4px;font-weight:500}
+    .bar-fill{height:8px;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+    .spinner{width:32px;height:32px;border:3px solid #e5e0d8;border-top-color:#c8401a;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .fade-in{animation:fadeIn .4s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .ai-block{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 100%);border-radius:12px;padding:24px;color:#f5f1eb;position:relative;overflow:hidden}
+    .ai-block::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(200,64,26,.3) 0%,transparent 70%);border-radius:50%}
+    details>summary{list-style:none;cursor:pointer}
+    details>summary::-webkit-details-marker{display:none}
   </style>
 </head>
 <body>
-  <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback, useRef } = React;
 
-  <script type="text/babel">
-    const { useState, useCallback, useRef, useEffect } = React;
-
-    // ── MODELO CSV ────────────────────────────────────────────────────────────
-    const CSV_TEMPLATE = `ID,Nome,Gestor_ID,Gestor_Nome,Cargo,Area
-1,Ana Paula Souza,,,"CEO","Diretoria"
-2,Carlos Menezes,1,Ana Paula Souza,"Diretor Comercial","Comercial"
-3,Fernanda Lima,1,Ana Paula Souza,"Diretora de Operações","Operações"
-4,Ricardo Alves,2,Carlos Menezes,"Gerente de Vendas","Comercial"
-5,Juliana Costa,2,Carlos Menezes,"Gerente de Marketing","Marketing"
-6,Bruno Ferreira,3,Fernanda Lima,"Gerente de Logística","Operações"
-7,Mariana Rocha,4,Ricardo Alves,"Analista de Vendas","Comercial"
-8,Pedro Oliveira,4,Ricardo Alves,"Analista de Vendas","Comercial"
-9,Lucas Santos,4,Ricardo Alves,"Analista de Vendas","Comercial"
-10,Camila Vieira,5,Juliana Costa,"Analista de Marketing","Marketing"
+// ── TEMPLATE ─────────────────────────────────────────────────────────────────
+const CSV_TEMPLATE = `id,nome,area,cargo,gestor
+1,Ana Paula Souza,Diretoria,CEO,
+2,Carlos Menezes,Comercial,Diretor Comercial,Ana Paula Souza
+3,Fernanda Lima,Operações,Diretora de Operações,Ana Paula Souza
+4,Ricardo Alves,Comercial,Gerente de Vendas,Carlos Menezes
+5,Juliana Costa,Marketing,Gerente de Marketing,Carlos Menezes
+6,Bruno Ferreira,Operações,Gerente de Logística,Fernanda Lima
+7,Mariana Rocha,Comercial,Analista de Vendas,Ricardo Alves
+8,Pedro Oliveira,Comercial,Analista de Vendas,Ricardo Alves
+9,Lucas Santos,Comercial,Analista de Vendas,Ricardo Alves
+10,Camila Vieira,Marketing,Analista de Marketing,Juliana Costa
 `;
 
-    function downloadTemplate() {
-      const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'modelo_organograma.csv';
-      a.click(); URL.revokeObjectURL(url);
+function downloadTemplate() {
+  const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'modelo_organograma.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── PARSE CSV ─────────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (!lines.length) return [];
+  const rawHeaders = lines[0].split(',');
+  const headers = rawHeaders.map(h => h.replace(/"/g,'').trim().toLowerCase().replace(/\s+/g,'_'));
+  return lines.slice(1).map(line => {
+    // Suporta campos com aspas e vírgulas internas
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQ = !inQ; }
+      else if (line[i] === ',' && !inQ) { vals.push(cur); cur = ''; }
+      else cur += line[i];
     }
+    vals.push(cur);
+    const row = {};
+    headers.forEach((h, i) => { row[h] = (vals[i] || '').replace(/"/g,'').trim(); });
+    return row;
+  }).filter(r => r['nome'] && r['nome'].length > 0);
+}
 
-    // ── PARSE ────────────────────────────────────────────────────────────────
-    function parseCSV(text) {
-      const lines = text.trim().split(/\r?\n/);
-      const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim().toLowerCase());
-      return lines.slice(1).map(line => {
-        const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || [];
-        const row = {};
-        headers.forEach((h, i) => { row[h] = (vals[i] || '').replace(/"/g,'').trim(); });
-        return row;
-      }).filter(r => r['id'] || r['nome']);
+// ── PARSE XLSX ────────────────────────────────────────────────────────────────
+function parseXLSX(buffer) {
+  const wb = XLSX.read(buffer, { type: 'array' });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+  return data.map(row => {
+    const norm = {};
+    Object.keys(row).forEach(k => {
+      norm[k.toLowerCase().replace(/\s+/g,'_').replace(/[áà]/g,'a').replace(/[éè]/g,'e').replace(/[íì]/g,'i').replace(/[óò]/g,'o').replace(/[úù]/g,'u').replace(/[ã]/g,'a').replace(/[õ]/g,'o').replace(/[ç]/g,'c')] = String(row[k]).trim();
+    });
+    return norm;
+  });
+}
+
+// ── NORMALIZA COLUNAS ─────────────────────────────────────────────────────────
+// Aceita variações de nome de coluna
+function normalizeRow(r) {
+  const get = (...keys) => {
+    for (const k of keys) {
+      if (r[k] !== undefined && r[k] !== '') return r[k];
     }
+    return '';
+  };
+  return {
+    id:         get('id','id_colaborador','codigo','matricula'),
+    nome:       get('nome','nome_colaborador','colaborador','name'),
+    gestorRef:  get('gestor','gestor_nome','nome_gestor','manager','gestor_id','id_gestor'), // pode ser nome ou ID
+    gestorId:   get('gestor_id','id_gestor'),
+    gestorNome: get('gestor_nome','nome_gestor','gestor'),
+    cargo:      get('cargo','funcao','posicao','titulo','position'),
+    area:       get('area','departamento','setor','department','área'),
+  };
+}
 
-    function parseXLSX(buffer) {
-      const wb = XLSX.read(buffer, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
-      return data.map(row => {
-        const norm = {};
-        Object.keys(row).forEach(k => { norm[k.toLowerCase().replace(/\s+/g,'_')] = String(row[k]).trim(); });
-        return norm;
-      });
+// ── ANALISE ───────────────────────────────────────────────────────────────────
+function analyzeOrg(rows) {
+  const people = rows.map(normalizeRow).filter(p => p.nome);
+
+  // Garante IDs únicos mesmo sem coluna id
+  people.forEach((p, i) => { if (!p.id) p.id = String(i + 1); });
+
+  // Índices para lookup
+  const byId   = {};  // id → person
+  const byNome = {};  // nome_normalizado → person
+  people.forEach(p => {
+    byId[p.id] = p;
+    byNome[p.nome.toLowerCase().trim()] = p;
+  });
+
+  // Resolve gestor: tenta por ID, depois por nome
+  people.forEach(p => {
+    let mgr = null;
+    if (p.gestorId && byId[p.gestorId]) {
+      mgr = byId[p.gestorId];
+    } else if (p.gestorNome) {
+      mgr = byNome[p.gestorNome.toLowerCase().trim()];
+    } else if (p.gestorRef) {
+      // gestorRef pode ser ID ou nome
+      mgr = byId[p.gestorRef] || byNome[p.gestorRef.toLowerCase().trim()];
     }
+    p.resolvedMgrId = mgr ? mgr.id : null;
+    p.resolvedMgrNome = mgr ? mgr.nome : (p.gestorRef || '');
+  });
 
-    // ── ANÁLISE ──────────────────────────────────────────────────────────────
-    function analyzeOrg(rows) {
-      // Normaliza colunas
-      const people = rows.map(r => ({
-        id: r['id'] || r['id_colaborador'] || '',
-        nome: r['nome'] || r['nome_colaborador'] || '',
-        gestorId: r['gestor_id'] || r['id_gestor'] || r['gestor'] || '',
-        gestorNome: r['gestor_nome'] || r['nome_gestor'] || '',
-        cargo: r['cargo'] || '',
-        area: r['área'] || r['area'] || '',
-      })).filter(p => p.id && p.nome);
+  // Subordinados diretos
+  const directReports = {};
+  people.forEach(p => { directReports[p.id] = []; });
+  people.forEach(p => {
+    if (p.resolvedMgrId) {
+      directReports[p.resolvedMgrId].push(p.id);
+    }
+  });
 
-      const byId = {};
-      people.forEach(p => { byId[p.id] = p; });
+  const managers = people.filter(p => directReports[p.id].length > 0);
+  const spans = managers.map(p => ({ ...p, span: directReports[p.id].length }));
+  const totalColabs = people.length;
+  const avgSpan = spans.length
+    ? (spans.reduce((a,b) => a + b.span, 0) / spans.length).toFixed(1)
+    : 0;
 
-      // Mapeia subordinados
-      const directReports = {};
-      people.forEach(p => { directReports[p.id] = []; });
-      people.forEach(p => {
-        if (p.gestorId && byId[p.gestorId]) {
-          directReports[p.gestorId].push(p.id);
-        }
-      });
-
-      // Líderes (têm pelo menos 1 subordinado)
-      const managers = people.filter(p => directReports[p.id].length > 0);
-      const spans = managers.map(p => ({ ...p, span: directReports[p.id].length }));
-
-      const totalColabs = people.length;
-      const avgSpan = spans.length ? (spans.reduce((a, b) => a + b.span, 0) / spans.length).toFixed(1) : 0;
-
-      // Níveis hierárquicos
-      function getLevel(id, visited = new Set()) {
-        if (visited.has(id)) return 0;
-        visited.add(id);
-        const p = byId[id];
-        if (!p || !p.gestorId || !byId[p.gestorId]) return 0;
-        return 1 + getLevel(p.gestorId, visited);
+  // Nível hierárquico (BFS a partir das raízes)
+  const roots = people.filter(p => !p.resolvedMgrId);
+  people.forEach(p => { p.level = -1; });
+  const queue = roots.map(p => { p.level = 0; return p; });
+  let qi = 0;
+  while (qi < queue.length) {
+    const cur = queue[qi++];
+    (directReports[cur.id] || []).forEach(childId => {
+      const child = byId[childId];
+      if (child && child.level === -1) {
+        child.level = cur.level + 1;
+        queue.push(child);
       }
-      people.forEach(p => { p.level = getLevel(p.id); });
-      const maxLevel = Math.max(...people.map(p => p.level)) + 1;
+    });
+  }
+  // Colaboradores sem gestor resolvido ficam no nível 0
+  people.forEach(p => { if (p.level === -1) p.level = 0; });
+  const maxLevel = Math.max(...people.map(p => p.level)) + 1;
 
-      // Desvios
-      const desvios = [];
-      people.forEach(p => {
-        const subordinados = directReports[p.id] || [];
-        const span = subordinados.length;
-        const isMgr = span > 0;
+  // Desvios
+  const desvios = [];
+  const seen = new Set();
+  people.forEach(p => {
+    const span = (directReports[p.id] || []).length;
+    const isMgr = span > 0;
 
-        // Liderança individual (gestor com 0 ou 1 direto)
-        if (isMgr && span === 1) {
-          desvios.push({ tipo: 'individual', pessoa: p, span, desc: 'Gestor com apenas 1 subordinado direto' });
-        }
-        // Span excessivo
-        if (span >= 10) {
-          desvios.push({ tipo: 'excessivo', pessoa: p, span, desc: `Span excessivo: ${span} subordinados diretos` });
-        }
-        // Span reduzido (entre 2 e 3)
-        if (isMgr && span >= 2 && span <= 3) {
-          desvios.push({ tipo: 'reduzido', pessoa: p, span, desc: `Span reduzido: apenas ${span} diretos` });
-        }
-      });
-
-      // Pescoços de garrafa: gerentes que reportam para gerentes que reportam para gerentes (3+ níveis consecutivos de 1 subordinado)
-      // Detecta nós intermediários com apenas 1 reporte E que não são folhas
-      people.forEach(p => {
-        const span = (directReports[p.id] || []).length;
-        if (!p.gestorId) return;
-        const gestor = byId[p.gestorId];
-        if (!gestor) return;
-        const gestorSpan = (directReports[gestor.id] || []).length;
-        if (span === 1 && gestorSpan === 1) {
-          // Evita duplicata
-          if (!desvios.find(d => d.tipo === 'pescoço' && d.pessoa.id === p.id)) {
-            desvios.push({ tipo: 'pescoço', pessoa: p, span, desc: 'Cadeia linear de camada única (pescoço de garrafa)' });
-          }
-        }
-      });
-
-      // Distribuição por área
-      const porArea = {};
-      people.forEach(p => {
-        if (p.area) porArea[p.area] = (porArea[p.area] || 0) + 1;
-      });
-
-      // Distribuição por nível
-      const porNivel = {};
-      people.forEach(p => { porNivel[p.level] = (porNivel[p.level] || 0) + 1; });
-
-      return {
-        people, byId, directReports, managers, spans,
-        totalColabs, avgSpan, maxLevel, desvios,
-        porArea, porNivel,
-        nivelLabels: ['C-Level/CEO','VP/Diretoria','Gerência','Coordenação','Especialistas','Analistas','Operacional']
-      };
+    if (isMgr && span === 1) {
+      desvios.push({ tipo:'individual', pessoa:p, span, desc:'Gestor com apenas 1 subordinado direto' });
     }
-
-    // ── BENCHMARKS ──────────────────────────────────────────────────────────
-    const BENCHMARKS = {
-      varejo: {
-        nome: 'Varejo',
-        avgSpan: '6–10',
-        niveis: '4–5',
-        mgmtRatio: '1:8–12',
-        desc: 'Varejistas tendem a estruturas achatadas com alto span, especialmente no nível de loja. Gerentes de loja frequentemente lideram 8–15 colaboradores. Corporativo costuma ter 4 níveis (CEO → VP → Gerente → Analista).',
-        color: '#3a6351'
-      },
-      tech: {
-        nome: 'Tecnologia',
-        avgSpan: '5–8',
-        niveis: '4–6',
-        mgmtRatio: '1:5–8',
-        desc: 'Empresas de tecnologia equilibram autonomia e especialização. Spans menores em P&D (3–6) e maiores em suporte/ops (8–12). Estruturas matriciais são comuns, aumentando a complexidade de reporte.',
-        color: '#1e40af'
-      },
-      financeiro: {
-        nome: 'Financeiro/Banco',
-        avgSpan: '4–7',
-        niveis: '5–7',
-        mgmtRatio: '1:5–7',
-        desc: 'Bancos e fintechs possuem hierarquias mais verticais por conta de compliance e risco. Spans menores nas áreas regulatórias, maiores no atendimento ao cliente.',
-        color: '#92400e'
-      },
-      industria: {
-        nome: 'Indústria/Manufatura',
-        avgSpan: '6–12',
-        niveis: '5–6',
-        mgmtRatio: '1:8–15',
-        desc: 'No chão de fábrica, spans chegam a 15–20. Na área administrativa, 5–8. Líderes de turno geralmente têm spans maiores que gestores corporativos.',
-        color: '#6b21a8'
+    if (span >= 10) {
+      desvios.push({ tipo:'excessivo', pessoa:p, span, desc:`Span excessivo: ${span} subordinados diretos` });
+    }
+    if (isMgr && span >= 2 && span <= 3) {
+      desvios.push({ tipo:'reduzido', pessoa:p, span, desc:`Span reduzido: apenas ${span} diretos` });
+    }
+    // Pescoço: nó único em cadeia linear
+    if (isMgr && span === 1 && p.resolvedMgrId) {
+      const mgrSpan = (directReports[p.resolvedMgrId] || []).length;
+      if (mgrSpan === 1 && !seen.has(p.id)) {
+        seen.add(p.id);
+        desvios.push({ tipo:'pescoço', pessoa:p, span, desc:'Cadeia linear — pescoço de garrafa estrutural' });
       }
-    };
+    }
+  });
 
-    // ── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────
-    function App() {
-      const [data, setData] = useState(null);
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState('');
-      const [dragging, setDragging] = useState(false);
-      const [aiText, setAiText] = useState('');
-      const [aiLoading, setAiLoading] = useState(false);
-      const [sector, setSector] = useState('');
-      const [revenue, setRevenue] = useState('');
-      const [benchmark, setBenchmark] = useState('varejo');
-      const fileRef = useRef();
+  // Distribuições
+  const porArea = {};
+  people.forEach(p => { if (p.area) porArea[p.area] = (porArea[p.area] || 0) + 1; });
 
-      const processFile = useCallback(async (file) => {
-        setLoading(true); setError(''); setData(null); setAiText('');
-        try {
-          const name = file.name.toLowerCase();
-          let rows;
-          if (name.endsWith('.csv')) {
-            const text = await file.text();
-            rows = parseCSV(text);
-          } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-            const buffer = await file.arrayBuffer();
-            rows = parseXLSX(new Uint8Array(buffer));
-          } else {
-            throw new Error('Formato não suportado. Use .csv ou .xlsx');
-          }
-          if (!rows.length) throw new Error('Arquivo vazio ou colunas não reconhecidas.');
-          const result = analyzeOrg(rows);
-          setData(result);
-        } catch(e) {
-          setError(e.message);
-        } finally {
-          setLoading(false);
-        }
-      }, []);
+  // Gestores sem gestor resolvido (top of tree)
+  const semGestor = people.filter(p => !p.resolvedMgrId).length;
 
-      const onDrop = useCallback(e => {
-        e.preventDefault(); setDragging(false);
-        const file = e.dataTransfer.files[0];
-        if (file) processFile(file);
-      }, [processFile]);
+  return {
+    people, byId, directReports, managers, spans,
+    totalColabs, avgSpan, maxLevel, desvios, porArea, semGestor
+  };
+}
 
-      const callClaude = useCallback(async () => {
-        if (!data) return;
-        setAiLoading(true); setAiText('');
-        const desvioResume = data.desvios.map(d =>
-          `- ${d.tipo.toUpperCase()}: ${d.pessoa.nome} (${d.pessoa.cargo}) — ${d.desc}`
-        ).join('\n');
-        const context = sector ? `Setor: ${sector}. Faturamento: ${revenue || 'não informado'}.` : '';
-        const prompt = `Você é um especialista em design organizacional. Analise a estrutura abaixo e forneça um diagnóstico executivo em português, seguido de 3 a 5 sugestões concretas de intervenção. Seja objetivo e prático, sem floreios.\n\n${context}\nTotal de colaboradores: ${data.totalColabs}\nSpan of Control médio: ${data.avgSpan}\nNúmero de gestores: ${data.managers.length}\nNíveis hierárquicos identificados: ${data.maxLevel}\nDesvios detectados (${data.desvios.length} total):\n${desvioResume || 'Nenhum desvio crítico identificado.'}\n\nEstrutura por área: ${JSON.stringify(data.porArea)}\n\nResponda em formato corrido, sem listas com marcadores, apenas texto com parágrafos bem estruturados. Comece com "Diagnóstico:" e depois "Intervenções recomendadas:".`;
+// ── BENCHMARKS ────────────────────────────────────────────────────────────────
+const BENCHMARKS = {
+  varejo:     { nome:'Varejo',             avgSpan:'6–10', niveis:'4–5', mgmtRatio:'1:8–12', cor:'#3a6351', desc:'Varejistas tendem a estruturas achatadas com alto span, especialmente no nível de loja. Gerentes de loja frequentemente lideram 8–15 colaboradores. Corporativo costuma ter 4 níveis (CEO → VP → Gerente → Analista).' },
+  logistica:  { nome:'Logística',          avgSpan:'6–12', niveis:'4–6', mgmtRatio:'1:8–15', cor:'#c8401a', desc:'Operações logísticas apresentam alto span no chão de operações (supervisores de turno com 10–20 pessoas). No corporativo o span cai para 5–8. Estruturas regionais com camadas de coordenação são comuns.' },
+  tech:       { nome:'Tecnologia',         avgSpan:'5–8',  niveis:'4–6', mgmtRatio:'1:5–8',  cor:'#1e40af', desc:'Tech companies equilibram autonomia e especialização. Spans menores em P&D (3–6) e maiores em suporte/ops (8–12). Estruturas matriciais são comuns.' },
+  financeiro: { nome:'Financeiro/Banco',   avgSpan:'4–7',  niveis:'5–7', mgmtRatio:'1:5–7',  cor:'#92400e', desc:'Bancos e fintechs possuem hierarquias mais verticais por compliance e risco. Spans menores nas áreas regulatórias, maiores no atendimento ao cliente.' },
+  industria:  { nome:'Indústria/Manufatura', avgSpan:'6–12', niveis:'5–6', mgmtRatio:'1:8–15', cor:'#6b21a8', desc:'No chão de fábrica spans chegam a 15–20. Na área administrativa, 5–8. Líderes de turno têm spans maiores que gestores corporativos.' },
+  saude:      { nome:'Saúde',              avgSpan:'4–8',  niveis:'4–6', mgmtRatio:'1:5–8',  cor:'#0e7490', desc:'Hospitais e clínicas equilibram especialização técnica com gestão de equipes. Coordenadores de enfermagem podem ter spans de 10–15, médicos geralmente menos.' },
+};
 
-        try {
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514',
-              max_tokens: 1000,
-              messages: [{ role: 'user', content: prompt }]
-            })
-          });
-          const json = await res.json();
-          const text = (json.content || []).map(c => c.text || '').join('');
-          setAiText(text || 'Não foi possível obter análise.');
-        } catch(e) {
-          setAiText('Erro ao conectar com a IA. Verifique sua conexão.');
-        } finally {
-          setAiLoading(false);
-        }
-      }, [data, sector, revenue]);
+// ── APP ───────────────────────────────────────────────────────────────────────
+function App() {
+  const [data, setData]         = useState(null);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [dragging, setDragging] = useState(false);
+  const [aiText, setAiText]     = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [sector, setSector]     = useState('');
+  const [revenue, setRevenue]   = useState('');
+  const [benchmark, setBenchmark] = useState('logistica');
+  const [fileName, setFileName] = useState('');
+  const fileRef = useRef();
 
-      const tagMap = {
-        pescoço: { label: 'Pescoço de Garrafa', cls: 'tag-pescoço' },
-        excessivo: { label: 'Span Excessivo', cls: 'tag-excessivo' },
-        reduzido: { label: 'Span Reduzido', cls: 'tag-reduzido' },
-        individual: { label: 'Liderança Individual', cls: 'tag-individual' },
-      };
+  const processFile = useCallback(async (file) => {
+    setLoading(true); setError(''); setData(null); setAiText(''); setFileName(file.name);
+    try {
+      const name = file.name.toLowerCase();
+      let rows;
+      if (name.endsWith('.csv')) {
+        rows = parseCSV(await file.text());
+      } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+        rows = parseXLSX(new Uint8Array(await file.arrayBuffer()));
+      } else {
+        throw new Error('Formato não suportado. Use .csv ou .xlsx');
+      }
+      if (!rows.length) throw new Error('Arquivo vazio ou colunas não reconhecidas.');
+      setData(analyzeOrg(rows));
+    } catch(e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-      const bm = BENCHMARKS[benchmark];
+  const onDrop = useCallback(e => {
+    e.preventDefault(); setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }, [processFile]);
 
-      return (
-        <div className="min-h-screen" style={{background:'#f5f1eb'}}>
-          {/* Header */}
-          <div style={{background:'#0f0f0f'}} className="px-6 py-5 flex items-center justify-between">
-            <div>
-              <div className="text-xs font-display tracking-widest uppercase mb-1" style={{color:'#c8401a'}}>Ferramenta</div>
-              <h1 className="font-display text-2xl font-bold text-white tracking-tight">Calculadora de Design Organizacional</h1>
+  const callClaude = useCallback(async () => {
+    if (!data) return;
+    setAiLoading(true); setAiText('');
+    const desvioResume = data.desvios.slice(0,20).map(d =>
+      `- ${d.tipo.toUpperCase()}: ${d.pessoa.nome} (${d.pessoa.cargo}) — ${d.desc}`
+    ).join('\n');
+    const ctx = [sector && `Setor: ${sector}`, revenue && `Faturamento: ${revenue}`].filter(Boolean).join('. ');
+    const prompt = `Você é um especialista sênior em design organizacional. Analise a estrutura abaixo e responda em português com dois blocos: "DIAGNÓSTICO:" (3 parágrafos sobre saúde estrutural, riscos e pontos positivos) e "INTERVENÇÕES RECOMENDADAS:" (4 a 6 ações concretas e prioritárias, numeradas). Seja direto e prático.\n\n${ctx ? ctx + '\n' : ''}Total de colaboradores: ${data.totalColabs}\nSpan of Control médio: ${data.avgSpan}\nNúmero de gestores identificados: ${data.managers.length}\nNíveis hierárquicos: ${data.maxLevel}\nTotal de desvios: ${data.desvios.length}\nDesvios (amostra):\n${desvioResume || 'Nenhum desvio crítico.'}\nDistribuição por área: ${JSON.stringify(data.porArea)}`;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:1000,
+          messages:[{ role:'user', content:prompt }]
+        })
+      });
+      const json = await res.json();
+      setAiText((json.content||[]).map(c=>c.text||'').join('') || 'Sem resposta.');
+    } catch(e) {
+      setAiText('Erro ao conectar com a IA.');
+    } finally {
+      setAiLoading(false);
+    }
+  }, [data, sector, revenue]);
+
+  const tagMap = {
+    pescoço:    { label:'Pescoço de Garrafa', cls:'tag-pescoço' },
+    excessivo:  { label:'Span Excessivo',     cls:'tag-excessivo' },
+    reduzido:   { label:'Span Reduzido',      cls:'tag-reduzido' },
+    individual: { label:'Liderança Individual',cls:'tag-individual' },
+  };
+
+  const bm = BENCHMARKS[benchmark] || BENCHMARKS.logistica;
+
+  return (
+    <div className="min-h-screen" style={{background:'#f5f1eb'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f'}} className="px-6 py-5 flex items-center justify-between">
+        <div>
+          <div className="text-xs font-display tracking-widest uppercase mb-1" style={{color:'#c8401a'}}>Ferramenta</div>
+          <h1 className="font-display text-2xl font-bold text-white tracking-tight">Calculadora de Design Organizacional</h1>
+        </div>
+        <div className="text-xs text-gray-500 font-body hidden md:block">Powered by Claude · Anthropic</div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+
+        {/* Upload */}
+        <div className="card">
+          <div className="section-label">Passo 1 — Carregue sua estrutura</div>
+          <div
+            className={`upload-zone rounded-xl p-8 text-center cursor-pointer ${dragging?'drag-over':''}`}
+            onDragOver={e=>{e.preventDefault();setDragging(true)}}
+            onDragLeave={()=>setDragging(false)}
+            onDrop={onDrop}
+            onClick={()=>fileRef.current.click()}
+          >
+            <div className="text-4xl mb-3">{fileName ? '✅' : '📂'}</div>
+            <div className="font-display font-semibold text-lg mb-1">
+              {fileName ? fileName : 'Arraste seu arquivo aqui'}
             </div>
-            <div className="text-xs text-gray-500 font-body hidden md:block">
-              Powered by Claude · Anthropic
+            <div className="text-sm text-gray-500 mb-2">Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong></div>
+            <div className="text-xs text-gray-400">
+              Colunas esperadas: <code className="bg-gray-100 px-1 rounded">id · nome · cargo · area · gestor</code>
             </div>
+            <div className="text-xs text-gray-400 mt-1">
+              A coluna <strong>gestor</strong> pode conter o <em>nome</em> ou o <em>ID</em> do gestor direto.
+            </div>
+            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden"
+              onChange={e=>e.target.files[0]&&processFile(e.target.files[0])} />
           </div>
+          <div className="mt-3 flex items-center gap-3 flex-wrap">
+            <button onClick={downloadTemplate}
+              className="text-xs font-display font-semibold underline underline-offset-2 flex items-center gap-1"
+              style={{color:'#c8401a'}}>
+              ⬇ Baixar arquivo modelo
+            </button>
+            <span className="text-gray-300">|</span>
+            <span className="text-xs text-gray-400">Todos os dados são processados localmente no seu navegador.</span>
+          </div>
+        </div>
 
-          <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-
-            {/* Upload */}
-            <div className="card">
-              <div className="section-label">Passo 1 — Carregue sua estrutura</div>
-              <div
-                className={`upload-zone rounded-xl p-8 text-center cursor-pointer ${dragging ? 'drag-over' : ''}`}
-                onDragOver={e => { e.preventDefault(); setDragging(true); }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={onDrop}
-                onClick={() => fileRef.current.click()}
-              >
-                <div className="text-4xl mb-3">📂</div>
-                <div className="font-display font-semibold text-lg mb-1">Arraste seu arquivo aqui</div>
-                <div className="text-sm text-gray-500 mb-4">Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong></div>
-                <div className="text-xs text-gray-400">Colunas necessárias: ID · Nome · Gestor_ID · Gestor_Nome · Cargo · Área</div>
-                <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden"
-                  onChange={e => e.target.files[0] && processFile(e.target.files[0])} />
-              </div>
-              <div className="mt-3 flex items-center gap-3">
-                <button onClick={downloadTemplate}
-                  className="text-xs font-display font-semibold underline underline-offset-2 flex items-center gap-1"
-                  style={{color:'#c8401a'}}>
-                  ⬇ Baixar arquivo modelo
-                </button>
-                <span className="text-gray-300">|</span>
-                <span className="text-xs text-gray-400">Todos os dados são processados localmente no seu navegador.</span>
-              </div>
+        {/* Contexto opcional */}
+        <div className="card">
+          <div className="section-label">Passo 2 — Contexto opcional (refina a análise de IA)</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Setor da empresa</label>
+              <select value={sector} onChange={e=>setSector(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
+                <option value="">Selecione...</option>
+                <option value="logística">Logística</option>
+                <option value="varejo">Varejo</option>
+                <option value="tecnologia">Tecnologia</option>
+                <option value="financeiro">Financeiro / Banco</option>
+                <option value="indústria">Indústria / Manufatura</option>
+                <option value="saúde">Saúde</option>
+                <option value="educação">Educação</option>
+                <option value="outros">Outros</option>
+              </select>
             </div>
-
-
-
-            {loading && (
-              <div className="flex items-center justify-center py-12">
-                <div className="spinner"></div>
-                <span className="ml-4 font-body text-gray-500">Processando estrutura...</span>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-body">
-                ⚠️ {error}
-              </div>
-            )}
-
-            {data && (
-              <div className="space-y-6 fade-in">
-
-                {/* Resumo Executivo */}
-                <div>
-                  <div className="section-label">Resumo Executivo</div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      { val: data.totalColabs, label: 'Colaboradores' },
-                      { val: data.avgSpan, label: 'Span médio' },
-                      { val: data.managers.length, label: 'Gestores' },
-                      { val: data.maxLevel, label: 'Níveis hierárq.' },
-                    ].map((m, i) => (
-                      <div key={i} className="card text-center">
-                        <div className="metric-big">{m.val}</div>
-                        <div className="metric-label">{m.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Span por gestor */}
-                <div className="card">
-                  <div className="section-label">Span of Control por Gestor</div>
-                  <div className="overflow-x-auto">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Gestor</th>
-                          <th>Cargo</th>
-                          <th>Área</th>
-                          <th>Diretos</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.spans.sort((a,b) => b.span - a.span).map(p => {
-                          let status, cls;
-                          if (p.span >= 10) { status='Excessivo'; cls='tag-excessivo'; }
-                          else if (p.span >= 4 && p.span <= 9) { status='Adequado'; cls='tag-ok'; }
-                          else if (p.span >= 2) { status='Reduzido'; cls='tag-reduzido'; }
-                          else { status='Individual'; cls='tag-individual'; }
-                          return (
-                            <tr key={p.id}>
-                              <td>
-                                <div className="font-medium">{p.nome}</div>
-                                <div className="text-xs text-gray-400">ID {p.id}</div>
-                              </td>
-                              <td className="text-gray-600">{p.cargo}</td>
-                              <td className="text-gray-500">{p.area || '—'}</td>
-                              <td>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-display font-bold">{p.span}</span>
-                                  <div className="flex-1 bg-gray-100 rounded h-2 min-w-16">
-                                    <div className="bar-fill bg-gray-700 rounded"
-                                      style={{width: `${Math.min(100, p.span/15*100)}%`,
-                                        background: p.span >= 10 ? '#d97706' : p.span <= 1 ? '#7c3aed' : '#3a6351'}}></div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td><span className={`tag ${cls}`}>{status}</span></td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Desvios */}
-                <div className="card">
-                  <div className="section-label">Desvios Estruturais ({data.desvios.length})</div>
-                  {data.desvios.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400">
-                      <div className="text-3xl mb-2">✅</div>
-                      <div className="font-display font-semibold">Nenhum desvio crítico identificado</div>
-                      <div className="text-sm mt-1">A estrutura analisada está dentro dos parâmetros esperados.</div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {data.desvios.map((d, i) => {
-                        const t = tagMap[d.tipo] || { label: d.tipo, cls: 'tag-ok' };
-                        return (
-                          <div key={i} className="flex items-start gap-3 p-3 rounded-lg"
-                            style={{background:'#faf8f5', borderLeft: '3px solid #e5e0d8'}}>
-                            <span className={`tag ${t.cls} mt-0.5 shrink-0`}>{t.label}</span>
-                            <div>
-                              <div className="font-medium text-sm">{d.pessoa.nome}</div>
-                              <div className="text-xs text-gray-500">{d.pessoa.cargo} · {d.pessoa.area || 'Área não informada'} · {d.desc}</div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Benchmark */}
-                <div className="card">
-                  <div className="section-label">Benchmark — Setor de {bm.nome}</div>
-                  <div className="grid md:grid-cols-3 gap-4 mb-4">
-                    {[
-                      { label: 'Span médio de referência', val: bm.avgSpan },
-                      { label: 'Níveis hierárquicos típicos', val: bm.niveis },
-                      { label: 'Proporção gestores:liderados', val: bm.mgmtRatio },
-                    ].map((m, i) => (
-                      <div key={i} className="rounded-xl p-4 text-center" style={{background:'#f5f1eb'}}>
-                        <div className="font-display font-bold text-2xl" style={{color: bm.color}}>{m.val}</div>
-                        <div className="text-xs text-gray-500 mt-1">{m.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{bm.desc}</p>
-                  <div className="mt-4 p-3 rounded-lg border" style={{borderColor: bm.color + '40', background: bm.color + '08'}}>
-                    <div className="text-xs font-display font-bold uppercase tracking-wide mb-1" style={{color: bm.color}}>Comparação com sua estrutura</div>
-                    <div className="text-sm text-gray-700">
-                      Seu span médio atual é <strong>{data.avgSpan}</strong>. Para o setor de {bm.nome}, o esperado é <strong>{bm.avgSpan}</strong>.
-                      {parseFloat(data.avgSpan) > parseFloat(bm.avgSpan.split('–')[1]) ? ' Sua estrutura está mais achatada que o benchmark — avalie sobrecarga dos gestores.' :
-                       parseFloat(data.avgSpan) < parseFloat(bm.avgSpan.split('–')[0]) ? ' Sua estrutura está mais verticalizada que o benchmark — considere reduzir camadas.' :
-                       ' Sua estrutura está alinhada com o benchmark do setor.'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* IA: Diagnóstico + Intervenções
-                <div>
-                  <div className="section-label">Diagnóstico IA + Sugestões de Intervenção</div>
-                  {!aiText && !aiLoading && (
-                    <div className="card flex flex-col items-center py-8 text-center">
-                      <div className="text-3xl mb-3">🤖</div>
-                      <div className="font-display font-semibold text-lg mb-1">Análise por Inteligência Artificial</div>
-                      <div className="text-sm text-gray-500 mb-5 max-w-md">
-                        Clique para obter um diagnóstico executivo e sugestões de intervenção gerados pelo Claude,
-                        considerando todos os dados analisados{sector ? ` e o contexto de setor: ${sector}` : ''}.
-                      </div>
-                      <button onClick={callClaude}
-                        className="px-6 py-3 rounded-xl font-display font-bold text-white text-sm tracking-wide"
-                        style={{background:'#0f0f0f'}}>
-                        Gerar Diagnóstico com IA →
-                      </button>
-                    </div>
-                  )}
-                  {aiLoading && (
-                    <div className="ai-block flex items-center gap-4">
-                      <div className="spinner" style={{borderTopColor:'#c8401a', borderColor:'#333'}}></div>
-                      <div className="font-body text-sm" style={{color:'#a0a0a0'}}>Analisando estrutura com Claude...</div>
-                    </div>
-                  )}
-                  {aiText && !aiLoading && (
-                    <div className="ai-block">
-                      <div className="text-xs font-display tracking-widest uppercase mb-4" style={{color:'#c8401a'}}>
-                        Análise Claude · {sector ? sector.toUpperCase() : 'GERAL'}
-                      </div>
-                      <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{color:'#e8e3db'}}>
-                        {aiText}
-                      </div>
-                      <button onClick={callClaude}
-                        className="mt-5 text-xs underline underline-offset-2" style={{color:'#c8401a'}}>
-                        Regenerar análise
-                      </button>
-                    </div>
-                  )}
-                </div>*/}
-
-                {/* Distribuição por área */}
-                {Object.keys(data.porArea).length > 0 && (
-                  <div className="card">
-                    <div className="section-label">Distribuição por Área</div>
-                    <div className="space-y-2">
-                      {Object.entries(data.porArea).sort((a,b)=>b[1]-a[1]).map(([area, n]) => (
-                        <div key={area} className="flex items-center gap-3">
-                          <div className="text-sm font-medium w-36 shrink-0 truncate">{area}</div>
-                          <div className="flex-1 bg-gray-100 rounded-full h-2">
-                            <div className="bar-fill rounded-full" style={{
-                              width: `${(n/data.totalColabs)*100}%`,
-                              background: '#0f0f0f'
-                            }}></div>
-                          </div>
-                          <div className="text-xs text-gray-500 w-10 text-right">{n}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="text-center text-xs text-gray-400 py-4 font-body">
-              Dados processados localmente · Nenhuma informação é enviada ao servidor sem sua ação · Calculadora de Design Organizacional
+            <div>
+              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Faixa de faturamento</label>
+              <select value={revenue} onChange={e=>setRevenue(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
+                <option value="">Selecione...</option>
+                <option value="startup (< R$ 10M)">Startup (&lt; R$ 10M)</option>
+                <option value="pequeno porte (R$ 10M–50M)">Pequeno porte (R$ 10–50M)</option>
+                <option value="médio porte (R$ 50M–500M)">Médio porte (R$ 50–500M)</option>
+                <option value="grande porte (R$ 500M–2B)">Grande porte (R$ 500M–2B)</option>
+                <option value="enterprise (> R$ 2B)">Enterprise (&gt; R$ 2B)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Benchmark de referência</label>
+              <select value={benchmark} onChange={e=>setBenchmark(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
+                {Object.entries(BENCHMARKS).map(([k,v])=>(
+                  <option key={k} value={k}>{v.nome}</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
-      );
-    }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="spinner"></div>
+            <span className="ml-4 font-body text-gray-500">Processando estrutura...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-body">
+            ⚠️ {error}
+          </div>
+        )}
+
+        {data && (
+          <div className="space-y-6 fade-in">
+
+            {/* Resumo Executivo */}
+            <div>
+              <div className="section-label">Resumo Executivo</div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { val: data.totalColabs,     label: 'Colaboradores' },
+                  { val: data.avgSpan,          label: 'Span médio' },
+                  { val: data.managers.length,  label: 'Gestores' },
+                  { val: data.maxLevel,         label: 'Níveis hierárq.' },
+                ].map((m,i)=>(
+                  <div key={i} className="card text-center">
+                    <div className="metric-big">{m.val}</div>
+                    <div className="metric-label">{m.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tabela spans */}
+            <div className="card">
+              <div className="section-label">Span of Control por Gestor</div>
+              <div className="overflow-x-auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Gestor</th>
+                      <th>Cargo</th>
+                      <th>Área</th>
+                      <th>Diretos</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.spans.sort((a,b)=>b.span-a.span).map(p=>{
+                      let status, cls;
+                      if (p.span>=10)           { status='Excessivo'; cls='tag-excessivo'; }
+                      else if (p.span>=4)       { status='Adequado';  cls='tag-ok'; }
+                      else if (p.span>=2)       { status='Reduzido';  cls='tag-reduzido'; }
+                      else                      { status='Individual';cls='tag-individual'; }
+                      const barColor = p.span>=10 ? '#d97706' : p.span<=1 ? '#7c3aed' : '#3a6351';
+                      return (
+                        <tr key={p.id}>
+                          <td>
+                            <div className="font-medium">{p.nome}</div>
+                            <div className="text-xs text-gray-400">ID {p.id}</div>
+                          </td>
+                          <td className="text-gray-600">{p.cargo||'—'}</td>
+                          <td className="text-gray-500 max-w-xs truncate" title={p.area}>{p.area||'—'}</td>
+                          <td>
+                            <div className="flex items-center gap-2">
+                              <span className="font-display font-bold">{p.span}</span>
+                              <div className="flex-1 bg-gray-100 rounded h-2 min-w-12">
+                                <div className="bar-fill rounded"
+                                  style={{width:`${Math.min(100,p.span/15*100)}%`,background:barColor}}></div>
+                              </div>
+                            </div>
+                          </td>
+                          <td><span className={`tag ${cls}`}>{status}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Desvios */}
+            <div className="card">
+              <div className="section-label">Desvios Estruturais ({data.desvios.length})</div>
+              {data.desvios.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <div className="text-3xl mb-2">✅</div>
+                  <div className="font-display font-semibold">Nenhum desvio crítico identificado</div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {data.desvios.map((d,i)=>{
+                    const t = tagMap[d.tipo]||{ label:d.tipo, cls:'tag-ok' };
+                    return (
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg"
+                        style={{background:'#faf8f5',borderLeft:'3px solid #e5e0d8'}}>
+                        <span className={`tag ${t.cls} mt-0.5 shrink-0`}>{t.label}</span>
+                        <div>
+                          <div className="font-medium text-sm">{d.pessoa.nome}</div>
+                          <div className="text-xs text-gray-500">{d.pessoa.cargo||'—'} · {d.pessoa.area||'—'} · {d.desc}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Benchmark */}
+            <div className="card">
+              <div className="section-label">Benchmark — {bm.nome}</div>
+              <div className="grid md:grid-cols-3 gap-4 mb-4">
+                {[
+                  { label:'Span médio de referência',      val:bm.avgSpan },
+                  { label:'Níveis hierárquicos típicos',   val:bm.niveis },
+                  { label:'Proporção gestores:liderados',  val:bm.mgmtRatio },
+                ].map((m,i)=>(
+                  <div key={i} className="rounded-xl p-4 text-center" style={{background:'#f5f1eb'}}>
+                    <div className="font-display font-bold text-2xl" style={{color:bm.cor}}>{m.val}</div>
+                    <div className="text-xs text-gray-500 mt-1">{m.label}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">{bm.desc}</p>
+              <div className="mt-4 p-3 rounded-lg border" style={{borderColor:bm.cor+'40',background:bm.cor+'08'}}>
+                <div className="text-xs font-display font-bold uppercase tracking-wide mb-1" style={{color:bm.cor}}>
+                  Comparação com sua estrutura
+                </div>
+                <div className="text-sm text-gray-700">
+                  Span médio atual: <strong>{data.avgSpan}</strong> · Benchmark {bm.nome}: <strong>{bm.avgSpan}</strong>.{' '}
+                  {(() => {
+                    const avg = parseFloat(data.avgSpan);
+                    const [lo,hi] = bm.avgSpan.split('–').map(Number);
+                    if (avg > hi) return 'Sua estrutura está mais achatada que o benchmark — avalie sobrecarga dos gestores.';
+                    if (avg < lo) return 'Sua estrutura está mais verticalizada que o benchmark — considere reduzir camadas.';
+                    return 'Span alinhado com o benchmark do setor. ✓';
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* IA */}
+            <div>
+              <div className="section-label">Diagnóstico IA + Sugestões de Intervenção</div>
+              {!aiText && !aiLoading && (
+                <div className="card flex flex-col items-center py-8 text-center">
+                  <div className="text-3xl mb-3">🤖</div>
+                  <div className="font-display font-semibold text-lg mb-1">Análise por Inteligência Artificial</div>
+                  <div className="text-sm text-gray-500 mb-5 max-w-md">
+                    Diagnóstico executivo e intervenções geradas pelo Claude com base em todos os dados analisados
+                    {sector ? ` (contexto: ${sector})` : ''}.
+                  </div>
+                  <button onClick={callClaude}
+                    className="px-6 py-3 rounded-xl font-display font-bold text-white text-sm tracking-wide"
+                    style={{background:'#0f0f0f'}}>
+                    Gerar Diagnóstico com IA →
+                  </button>
+                </div>
+              )}
+              {aiLoading && (
+                <div className="ai-block flex items-center gap-4">
+                  <div className="spinner" style={{borderTopColor:'#c8401a',borderColor:'#333'}}></div>
+                  <div className="text-sm" style={{color:'#a0a0a0'}}>Analisando estrutura com Claude...</div>
+                </div>
+              )}
+              {aiText && !aiLoading && (
+                <div className="ai-block">
+                  <div className="text-xs font-display tracking-widest uppercase mb-4" style={{color:'#c8401a'}}>
+                    Análise Claude · {sector ? sector.toUpperCase() : 'ESTRUTURA GERAL'}
+                  </div>
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{color:'#e8e3db'}}>
+                    {aiText}
+                  </div>
+                  <button onClick={callClaude}
+                    className="mt-5 text-xs underline underline-offset-2" style={{color:'#c8401a'}}>
+                    Regenerar análise
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Distribuição por área */}
+            {Object.keys(data.porArea).length > 0 && (
+              <div className="card">
+                <div className="section-label">Distribuição por Área</div>
+                <div className="space-y-2">
+                  {Object.entries(data.porArea).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([area,n])=>(
+                    <div key={area} className="flex items-center gap-3">
+                      <div className="text-sm font-medium w-48 shrink-0 truncate" title={area}>{area}</div>
+                      <div className="flex-1 bg-gray-100 rounded-full h-2">
+                        <div className="bar-fill rounded-full" style={{
+                          width:`${(n/data.totalColabs)*100}%`,
+                          background:'#0f0f0f'
+                        }}></div>
+                      </div>
+                      <div className="text-xs text-gray-500 w-10 text-right">{n}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        <div className="text-center text-xs text-gray-400 py-4 font-body">
+          Dados processados localmente · Nenhuma informação é enviada ao servidor sem sua ação
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
 </body>
 </html>
