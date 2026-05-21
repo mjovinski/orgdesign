@@ -665,92 +665,7 @@ function App() {
           {data && (
             <div className="stack fade-in">
 
-              {/* ── RESUMO EXECUTIVO ── */}
-              <div>
-                <div className="slabel">Resumo Executivo</div>
-                <div className="grid-4">
-                  {[
-                    { val:data.totalColabs,    lbl:'Colaboradores' },
-                    { val:data.avgSpan,        lbl:'Span médio' },
-                    { val:data.managers.length,lbl:'Gestores' },
-                    { val:data.maxLevel,       lbl:'Níveis hierárq.' },
-                  ].map((m,i)=>(
-                    <div key={i} className="metric-card">
-                      <div className="metric-val">{m.val}</div>
-                      <div className="metric-lbl">{m.lbl}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* ── SPAN TABLE ── */}
-              <div className="card">
-                <div className="slabel">Span of Control por Gestor</div>
-                <div className="overflow-x">
-                  <table className="tbl">
-                    <thead>
-                      <tr>
-                        <th>Gestor</th><th>Cargo</th><th>Área</th><th>Diretos</th><th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.spans.sort((a,b)=>b.span-a.span).map(p=>{
-                        let status, cls;
-                        if      (p.span>=10)       { status='Excessivo'; cls='tag-excessivo'; }
-                        else if (p.span>=4)        { status='Adequado';  cls='tag-ok'; }
-                        else if (p.span>=2)        { status='Reduzido';  cls='tag-reduzido'; }
-                        else                       { status='Individual';cls='tag-individual'; }
-                        const cor = p.span>=10?'#e65100':p.span<=1?'#880e4f':'#2e7d32';
-                        return (
-                          <tr key={p.id}>
-                            <td>
-                              <div className="name">{p.nome}</div>
-                              <div className="sub">ID {p.id}</div>
-                            </td>
-                            <td style={{color:'var(--text-muted)'}}>{p.cargo||'—'}</td>
-                            <td style={{maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--text-faint)'}} title={p.area}>{p.area||'—'}</td>
-                            <td>
-                              <div style={{display:'flex',alignItems:'center',gap:8}}>
-                                <span style={{fontWeight:700,color:'var(--rose-dark)',minWidth:20}}>{p.span}</span>
-                                <div className="bar-track">
-                                  <div className="bar-fill" style={{width:`${Math.min(100,p.span/15*100)}%`,background:cor}}></div>
-                                </div>
-                              </div>
-                            </td>
-                            <td><span className={`tag ${cls}`}>{status}</span></td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* ── DESVIOS ── */}
-              <div className="card">
-                <div className="slabel">Desvios Estruturais ({data.desvios.length})</div>
-                {data.desvios.length===0 ? (
-                  <div style={{textAlign:'center',padding:'32px 0',color:'var(--text-muted)'}}>
-                    <div style={{fontSize:32,marginBottom:8}}>✅</div>
-                    <div style={{fontWeight:700}}>Nenhum desvio crítico identificado</div>
-                  </div>
-                ) : (
-                  <div className="stack" style={{gap:8}}>
-                    {data.desvios.map((d,i)=>{
-                      const t = tagMap[d.tipo]||{label:d.tipo,cls:'tag-ok'};
-                      return (
-                        <div key={i} className="desvio-row">
-                          <span className={`tag ${t.cls}`} style={{marginTop:2,flexShrink:0}}>{t.label}</span>
-                          <div>
-                            <div className="nome">{d.pessoa.nome}</div>
-                            <div className="desc">{d.pessoa.cargo||'—'} · {d.pessoa.area||'—'} · {d.desc}</div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
 
               {/* ── BENCHMARK ── */}
               <div className="card">
@@ -784,6 +699,54 @@ function App() {
                   </div>
                 </div>
               </div>
+
+              {/* ── RESUMO EXECUTIVO ── */}
+              <div>
+                <div className="slabel">Resumo Executivo</div>
+                <div className="grid-4">
+                  {[
+                    { val:data.totalColabs,    lbl:'Colaboradores' },
+                    { val:data.avgSpan,        lbl:'Span médio' },
+                    { val:data.managers.length,lbl:'Gestores' },
+                    { val:data.maxLevel,       lbl:'Níveis hierárq.' },
+                  ].map((m,i)=>(
+                    <div key={i} className="metric-card">
+                      <div className="metric-val">{m.val}</div>
+                      <div className="metric-lbl">{m.lbl}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+
+
+              {/* ── DESVIOS ── */}
+              <div className="card">
+                <div className="slabel">Desvios Estruturais ({data.desvios.length})</div>
+                {data.desvios.length===0 ? (
+                  <div style={{textAlign:'center',padding:'32px 0',color:'var(--text-muted)'}}>
+                    <div style={{fontSize:32,marginBottom:8}}>✅</div>
+                    <div style={{fontWeight:700}}>Nenhum desvio crítico identificado</div>
+                  </div>
+                ) : (
+                  <div className="stack" style={{gap:8}}>
+                    {data.desvios.map((d,i)=>{
+                      const t = tagMap[d.tipo]||{label:d.tipo,cls:'tag-ok'};
+                      return (
+                        <div key={i} className="desvio-row">
+                          <span className={`tag ${t.cls}`} style={{marginTop:2,flexShrink:0}}>{t.label}</span>
+                          <div>
+                            <div className="nome">{d.pessoa.nome}</div>
+                            <div className="desc">{d.pessoa.cargo||'—'} · {d.pessoa.area||'—'} · {d.desc}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+
 
               {/* ── DIAGNÓSTICO LOCAL ── */}
               <div>
@@ -828,6 +791,49 @@ function App() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* ── SPAN TABLE ── */}
+              <div className="card">
+                <div className="slabel">Span of Control por Gestor</div>
+                <div className="overflow-x">
+                  <table className="tbl">
+                    <thead>
+                      <tr>
+                        <th>Gestor</th><th>Cargo</th><th>Área</th><th>Diretos</th><th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.spans.sort((a,b)=>b.span-a.span).map(p=>{
+                        let status, cls;
+                        if      (p.span>=10)       { status='Excessivo'; cls='tag-excessivo'; }
+                        else if (p.span>=4)        { status='Adequado';  cls='tag-ok'; }
+                        else if (p.span>=2)        { status='Reduzido';  cls='tag-reduzido'; }
+                        else                       { status='Individual';cls='tag-individual'; }
+                        const cor = p.span>=10?'#e65100':p.span<=1?'#880e4f':'#2e7d32';
+                        return (
+                          <tr key={p.id}>
+                            <td>
+                              <div className="name">{p.nome}</div>
+                              <div className="sub">ID {p.id}</div>
+                            </td>
+                            <td style={{color:'var(--text-muted)'}}>{p.cargo||'—'}</td>
+                            <td style={{maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--text-faint)'}} title={p.area}>{p.area||'—'}</td>
+                            <td>
+                              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                                <span style={{fontWeight:700,color:'var(--rose-dark)',minWidth:20}}>{p.span}</span>
+                                <div className="bar-track">
+                                  <div className="bar-fill" style={{width:`${Math.min(100,p.span/15*100)}%`,background:cor}}></div>
+                                </div>
+                              </div>
+                            </td>
+                            <td><span className={`tag ${cls}`}>{status}</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* ── DISTRIBUIÇÃO POR ÁREA ── */}
