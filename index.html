@@ -9,55 +9,288 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { display: [Arial,'sans-serif'], body: [Arial,'sans-serif'] },
-          colors: { ink:'#0f0f0f', bone:'#f5f1eb', rust:'#c8401a', sage:'#3a6351', amber:'#d4860a' }
+          fontFamily: { sans: ['Arial','Helvetica','sans-serif'] },
+          colors: {
+            rose:  { 900:'#4a0022', 800:'#6b0032', 700:'#8b0042', 600:'#a8004f', 500:'#c2185b', 400:'#e91e8c', 300:'#f06292', 100:'#fce4ec', 50:'#fff0f5' },
+            snow:  '#ffffff',
+            offwhite: '#fdf6f9',
+          }
         }
       }
     };
   </script>
+
   <style>
-    *{box-sizing:border-box}
-    body{font-family:Arial,sans-serif;background:#f5f1eb;color:#0f0f0f;min-height:100vh}
-    h1,h2,h3,h4,.font-display{font-family:Arial,sans-serif}
-    .upload-zone{border:2px dashed #c8401a;transition:all .2s ease}
-    .upload-zone:hover,.upload-zone.drag-over{background:#fff8f5;border-color:#0f0f0f}
-    .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
-    .tag-pescoço{background:#fee2e2;color:#991b1b}
-    .tag-excessivo{background:#fef3c7;color:#92400e}
-    .tag-reduzido{background:#dbeafe;color:#1e40af}
-    .tag-individual{background:#f3e8ff;color:#6b21a8}
-    .tag-ok{background:#d1fae5;color:#065f46}
-    .card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e5e0d8}
-    .section-label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#c8401a;margin-bottom:8px}
-    table{border-collapse:collapse;width:100%}
-    th{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;padding:10px 14px;text-align:left;border-bottom:2px solid #e5e0d8}
-    td{padding:10px 14px;font-size:13px;border-bottom:1px solid #f0ece5}
-    tr:last-child td{border-bottom:none}
-    tr:hover td{background:#faf8f5}
-    .metric-big{font-family:Arial,sans-serif;font-size:48px;font-weight:800;line-height:1;color:#0f0f0f}
-    .metric-label{font-size:12px;color:#6b7280;margin-top:4px;font-weight:500}
-    .bar-fill{height:8px;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-    .spinner{width:32px;height:32px;border:3px solid #e5e0d8;border-top-color:#c8401a;border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade-in{animation:fadeIn .4s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .ai-block{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 100%);border-radius:12px;padding:24px;color:#f5f1eb;position:relative;overflow:hidden}
-    .ai-block::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(200,64,26,.3) 0%,transparent 70%);border-radius:50%}
-    details>summary{list-style:none;cursor:pointer}
-    details>summary::-webkit-details-marker{display:none}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose-dark:   #4a0022;
+      --rose-mid:    #8b0042;
+      --rose-vivid:  #c2185b;
+      --rose-light:  #fce4ec;
+      --rose-faint:  #fff0f5;
+      --white:       #ffffff;
+      --offwhite:    #fdf6f9;
+      --border:      #f0d6e4;
+      --text-main:   #2d0015;
+      --text-muted:  #8c5070;
+      --text-faint:  #c490aa;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--offwhite);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .app-header {
+      background: var(--rose-dark);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--rose-mid);
+    }
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .app-header .sub {
+      font-size: 11px;
+      color: var(--rose-light);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+    .badge-powered {
+      font-size: 10px;
+      color: var(--rose-light);
+      opacity: 0.5;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+    .stack { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .card-dark {
+      background: var(--rose-dark);
+      border-radius: 10px;
+      padding: 24px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-dark::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(194,24,91,.35) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .card-tint { background: var(--rose-faint); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+
+    /* ── SECTION LABEL ── */
+    .slabel {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--rose-vivid);
+      margin-bottom: 14px;
+    }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      border: 2px dashed var(--rose-vivid);
+      border-radius: 10px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      background: var(--rose-faint);
+      border-color: var(--rose-dark);
+    }
+    .upload-zone .icon { font-size: 36px; margin-bottom: 10px; }
+    .upload-zone .title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .upload-zone .hint  { font-size: 12px; color: var(--text-muted); }
+    .upload-zone code   { background: var(--rose-light); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; }
+
+    /* ── BUTTON ── */
+    .btn {
+      display: inline-block;
+      background: var(--rose-dark);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: background .15s;
+    }
+    .btn:hover { background: var(--rose-mid); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--rose-vivid);
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 0;
+    }
+    .btn-ghost:hover { color: var(--rose-dark); }
+
+    /* ── FORM CONTROLS ── */
+    .field label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .field select, .field input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field select:focus, .field input:focus { border-color: var(--rose-vivid); }
+
+    /* ── GRID ── */
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    @media(max-width:600px) { .grid-3,.grid-4 { grid-template-columns: repeat(2,1fr); } }
+
+    /* ── METRIC ── */
+    .metric-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--rose-dark);
+      line-height: 1;
+    }
+    .metric-lbl { font-size: 11px; color: var(--text-muted); margin-top: 5px; letter-spacing: 0.04em; }
+
+    /* ── TABLE ── */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); padding: 9px 12px; text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    .tbl td { padding: 9px 12px; font-size: 13px; border-bottom: 1px solid var(--rose-faint); }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: var(--rose-faint); }
+    .tbl .name { font-weight: 600; color: var(--text-main); }
+    .tbl .sub  { font-size: 11px; color: var(--text-faint); }
+
+    /* ── TAGS ── */
+    .tag {
+      display: inline-block; padding: 2px 9px; border-radius: 999px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .tag-excessivo  { background: #ffefd5; color: #7a3600; }
+    .tag-reduzido   { background: #e8f0fe; color: #1a3a8f; }
+    .tag-individual { background: #fce4ec; color: #880e4f; }
+    .tag-pescoço    { background: #fde8e8; color: #7f1d1d; }
+    .tag-ok         { background: #e8f5e9; color: #1b5e20; }
+
+    /* ── BAR ── */
+    .bar-track { flex: 1; background: var(--rose-light); border-radius: 4px; height: 7px; min-width: 60px; }
+    .bar-fill  { height: 7px; border-radius: 4px; transition: width .6s ease; }
+
+    /* ── DESVIO ROW ── */
+    .desvio-row {
+      display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px;
+      border-radius: 8px; background: var(--rose-faint);
+      border-left: 3px solid var(--border);
+    }
+    .desvio-row .nome  { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .desvio-row .desc  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* ── BENCH ── */
+    .bench-stat {
+      background: var(--offwhite); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px; text-align: center;
+    }
+    .bench-stat .val { font-size: 22px; font-weight: 700; }
+    .bench-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+    /* ── DIAGNOSTICO ── */
+    .diag-section { margin-bottom: 18px; }
+    .diag-section h3 { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rose-light); opacity:.7; margin-bottom: 10px; }
+    .diag-item { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+    .diag-bullet {
+      width: 22px; height: 22px; min-width: 22px; border-radius: 50%;
+      background: var(--rose-vivid); color: #fff;
+      font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .diag-item p { font-size: 13px; line-height: 1.55; color: #f0d6e4; }
+
+    /* ── AREA BAR ── */
+    .area-row { display: flex; align-items: center; gap: 10px; }
+    .area-row .area-name { font-size: 12px; font-weight: 600; width: 180px; min-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .area-row .area-n { font-size: 11px; color: var(--text-muted); width: 28px; text-align: right; }
+
+    /* ── MISC ── */
+    .spinner { width: 30px; height: 30px; border: 3px solid var(--rose-light); border-top-color: var(--rose-vivid); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation: fadeIn .35s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    .error-box { background: #fff0f0; border: 1px solid #fca5a5; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #991b1b; }
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .overflow-x { overflow-x: auto; }
   </style>
 </head>
 <body>
+
 <div id="root"></div>
+
 <script type="text/babel">
 const { useState, useCallback, useRef } = React;
 
-// ── TEMPLATE ─────────────────────────────────────────────────────────────────
+// ─── TEMPLATE CSV ──────────────────────────────────────────────────────────
 const CSV_TEMPLATE = `id,nome,area,cargo,gestor
 1,Ana Paula Souza,Diretoria,CEO,
 2,Carlos Menezes,Comercial,Diretor Comercial,Ana Paula Souza
@@ -75,559 +308,556 @@ function downloadTemplate() {
   const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'modelo_organograma.csv';
-  a.click(); URL.revokeObjectURL(url);
+  a.href = url; a.download = 'modelo_organograma.csv'; a.click();
+  URL.revokeObjectURL(url);
 }
 
-// ── PARSE CSV ─────────────────────────────────────────────────────────────────
+// ─── PARSERS ───────────────────────────────────────────────────────────────
 function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/);
   if (!lines.length) return [];
-  const rawHeaders = lines[0].split(',');
-  const headers = rawHeaders.map(h => h.replace(/"/g,'').trim().toLowerCase().replace(/\s+/g,'_'));
+  const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim().toLowerCase().replace(/\s+/g,'_'));
   return lines.slice(1).map(line => {
-    // Suporta campos com aspas e vírgulas internas
-    const vals = [];
-    let cur = '', inQ = false;
+    const vals = []; let cur = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
-      if (line[i] === '"') { inQ = !inQ; }
-      else if (line[i] === ',' && !inQ) { vals.push(cur); cur = ''; }
-      else cur += line[i];
+      if (line[i]==='"') inQ=!inQ;
+      else if (line[i]===',' && !inQ) { vals.push(cur); cur=''; }
+      else cur+=line[i];
     }
     vals.push(cur);
     const row = {};
-    headers.forEach((h, i) => { row[h] = (vals[i] || '').replace(/"/g,'').trim(); });
+    headers.forEach((h,i) => { row[h]=(vals[i]||'').replace(/"/g,'').trim(); });
     return row;
   }).filter(r => r['nome'] && r['nome'].length > 0);
 }
 
-// ── PARSE XLSX ────────────────────────────────────────────────────────────────
 function parseXLSX(buffer) {
-  const wb = XLSX.read(buffer, { type: 'array' });
+  const wb = XLSX.read(buffer, { type:'array' });
   const ws = wb.Sheets[wb.SheetNames[0]];
-  const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+  const data = XLSX.utils.sheet_to_json(ws, { defval:'' });
   return data.map(row => {
     const norm = {};
     Object.keys(row).forEach(k => {
-      norm[k.toLowerCase().replace(/\s+/g,'_').replace(/[áà]/g,'a').replace(/[éè]/g,'e').replace(/[íì]/g,'i').replace(/[óò]/g,'o').replace(/[úù]/g,'u').replace(/[ã]/g,'a').replace(/[õ]/g,'o').replace(/[ç]/g,'c')] = String(row[k]).trim();
+      const key = k.toLowerCase().trim()
+        .replace(/\s+/g,'_')
+        .replace(/[áàã]/g,'a').replace(/[éè]/g,'e')
+        .replace(/[íì]/g,'i').replace(/[óòõ]/g,'o')
+        .replace(/[úù]/g,'u').replace(/ç/g,'c');
+      norm[key] = String(row[k]).trim();
     });
     return norm;
   });
 }
 
-// ── NORMALIZA COLUNAS ─────────────────────────────────────────────────────────
-// Aceita variações de nome de coluna
+// ─── NORMALIZA LINHA ────────────────────────────────────────────────────────
 function normalizeRow(r) {
-  const get = (...keys) => {
-    for (const k of keys) {
-      if (r[k] !== undefined && r[k] !== '') return r[k];
-    }
-    return '';
-  };
+  const get = (...keys) => { for (const k of keys) if (r[k]!==undefined && r[k]!=='') return r[k]; return ''; };
   return {
     id:         get('id','id_colaborador','codigo','matricula'),
     nome:       get('nome','nome_colaborador','colaborador','name'),
-    gestorRef:  get('gestor','gestor_nome','nome_gestor','manager','gestor_id','id_gestor'), // pode ser nome ou ID
+    gestorRef:  get('gestor','gestor_nome','nome_gestor','manager','gestor_id','id_gestor'),
     gestorId:   get('gestor_id','id_gestor'),
     gestorNome: get('gestor_nome','nome_gestor','gestor'),
     cargo:      get('cargo','funcao','posicao','titulo','position'),
-    area:       get('area','departamento','setor','department','área'),
+    area:       get('area','area','departamento','setor','department'),
   };
 }
 
-// ── ANALISE ───────────────────────────────────────────────────────────────────
+// ─── ANÁLISE ────────────────────────────────────────────────────────────────
 function analyzeOrg(rows) {
   const people = rows.map(normalizeRow).filter(p => p.nome);
+  people.forEach((p, i) => { if (!p.id) p.id = String(i+1); });
 
-  // Garante IDs únicos mesmo sem coluna id
-  people.forEach((p, i) => { if (!p.id) p.id = String(i + 1); });
-
-  // Índices para lookup
-  const byId   = {};  // id → person
-  const byNome = {};  // nome_normalizado → person
+  const byId   = {};
+  const byNome = {};
   people.forEach(p => {
     byId[p.id] = p;
     byNome[p.nome.toLowerCase().trim()] = p;
   });
 
-  // Resolve gestor: tenta por ID, depois por nome
+  // Resolve gestor por ID ou nome
   people.forEach(p => {
     let mgr = null;
-    if (p.gestorId && byId[p.gestorId]) {
-      mgr = byId[p.gestorId];
-    } else if (p.gestorNome) {
-      mgr = byNome[p.gestorNome.toLowerCase().trim()];
-    } else if (p.gestorRef) {
-      // gestorRef pode ser ID ou nome
-      mgr = byId[p.gestorRef] || byNome[p.gestorRef.toLowerCase().trim()];
-    }
-    p.resolvedMgrId = mgr ? mgr.id : null;
+    if (p.gestorId && byId[p.gestorId]) mgr = byId[p.gestorId];
+    else if (p.gestorNome) mgr = byNome[p.gestorNome.toLowerCase().trim()];
+    else if (p.gestorRef)  mgr = byId[p.gestorRef] || byNome[p.gestorRef.toLowerCase().trim()];
+    p.resolvedMgrId   = mgr ? mgr.id   : null;
     p.resolvedMgrNome = mgr ? mgr.nome : (p.gestorRef || '');
   });
 
-  // Subordinados diretos
+  // Subordinados
   const directReports = {};
   people.forEach(p => { directReports[p.id] = []; });
-  people.forEach(p => {
-    if (p.resolvedMgrId) {
-      directReports[p.resolvedMgrId].push(p.id);
-    }
-  });
+  people.forEach(p => { if (p.resolvedMgrId) directReports[p.resolvedMgrId].push(p.id); });
 
   const managers = people.filter(p => directReports[p.id].length > 0);
-  const spans = managers.map(p => ({ ...p, span: directReports[p.id].length }));
+  const spans    = managers.map(p => ({ ...p, span: directReports[p.id].length }));
   const totalColabs = people.length;
   const avgSpan = spans.length
-    ? (spans.reduce((a,b) => a + b.span, 0) / spans.length).toFixed(1)
-    : 0;
+    ? (spans.reduce((a,b)=>a+b.span,0)/spans.length).toFixed(1) : '0';
 
-  // Nível hierárquico (BFS a partir das raízes)
+  // Níveis via BFS
   const roots = people.filter(p => !p.resolvedMgrId);
   people.forEach(p => { p.level = -1; });
-  const queue = roots.map(p => { p.level = 0; return p; });
+  const queue = roots.map(p => { p.level=0; return p; });
   let qi = 0;
   while (qi < queue.length) {
     const cur = queue[qi++];
-    (directReports[cur.id] || []).forEach(childId => {
-      const child = byId[childId];
-      if (child && child.level === -1) {
-        child.level = cur.level + 1;
-        queue.push(child);
-      }
+    (directReports[cur.id]||[]).forEach(cid => {
+      const child = byId[cid];
+      if (child && child.level===-1) { child.level = cur.level+1; queue.push(child); }
     });
   }
-  // Colaboradores sem gestor resolvido ficam no nível 0
-  people.forEach(p => { if (p.level === -1) p.level = 0; });
-  const maxLevel = Math.max(...people.map(p => p.level)) + 1;
+  people.forEach(p => { if (p.level===-1) p.level=0; });
+  const maxLevel = Math.max(...people.map(p=>p.level))+1;
 
   // Desvios
   const desvios = [];
-  const seen = new Set();
+  const seenPesc = new Set();
   people.forEach(p => {
-    const span = (directReports[p.id] || []).length;
+    const span = (directReports[p.id]||[]).length;
     const isMgr = span > 0;
-
-    if (isMgr && span === 1) {
-      desvios.push({ tipo:'individual', pessoa:p, span, desc:'Gestor com apenas 1 subordinado direto' });
-    }
-    if (span >= 10) {
-      desvios.push({ tipo:'excessivo', pessoa:p, span, desc:`Span excessivo: ${span} subordinados diretos` });
-    }
-    if (isMgr && span >= 2 && span <= 3) {
-      desvios.push({ tipo:'reduzido', pessoa:p, span, desc:`Span reduzido: apenas ${span} diretos` });
-    }
-    // Pescoço: nó único em cadeia linear
-    if (isMgr && span === 1 && p.resolvedMgrId) {
-      const mgrSpan = (directReports[p.resolvedMgrId] || []).length;
-      if (mgrSpan === 1 && !seen.has(p.id)) {
-        seen.add(p.id);
+    if (isMgr && span===1) desvios.push({ tipo:'individual', pessoa:p, span, desc:'Gestor com apenas 1 subordinado direto' });
+    if (span>=10)           desvios.push({ tipo:'excessivo',  pessoa:p, span, desc:`Span excessivo: ${span} subordinados diretos` });
+    if (isMgr && span>=2 && span<=3) desvios.push({ tipo:'reduzido', pessoa:p, span, desc:`Span reduzido: apenas ${span} diretos` });
+    if (isMgr && span===1 && p.resolvedMgrId) {
+      const mgrSpan = (directReports[p.resolvedMgrId]||[]).length;
+      if (mgrSpan===1 && !seenPesc.has(p.id)) {
+        seenPesc.add(p.id);
         desvios.push({ tipo:'pescoço', pessoa:p, span, desc:'Cadeia linear — pescoço de garrafa estrutural' });
       }
     }
   });
 
-  // Distribuições
   const porArea = {};
-  people.forEach(p => { if (p.area) porArea[p.area] = (porArea[p.area] || 0) + 1; });
+  people.forEach(p => { if (p.area) porArea[p.area]=(porArea[p.area]||0)+1; });
 
-  // Gestores sem gestor resolvido (top of tree)
-  const semGestor = people.filter(p => !p.resolvedMgrId).length;
-
-  return {
-    people, byId, directReports, managers, spans,
-    totalColabs, avgSpan, maxLevel, desvios, porArea, semGestor
-  };
+  return { people, byId, directReports, managers, spans, totalColabs, avgSpan, maxLevel, desvios, porArea };
 }
 
-// ── BENCHMARKS ────────────────────────────────────────────────────────────────
+// ─── MOTOR DE DIAGNÓSTICO LOCAL ─────────────────────────────────────────────
+function gerarDiagnostico(data, sector, revenue) {
+  const { totalColabs, avgSpan, maxLevel, desvios, managers, porArea } = data;
+  const avg = parseFloat(avgSpan);
+
+  const excessivos  = desvios.filter(d=>d.tipo==='excessivo');
+  const reduzidos   = desvios.filter(d=>d.tipo==='reduzido');
+  const individuais = desvios.filter(d=>d.tipo==='individual');
+  const pescocos    = desvios.filter(d=>d.tipo==='pescoço');
+
+  // ── DIAGNÓSTICO ──
+  const diagnostico = [];
+
+  // Parágrafo 1: tamanho e complexidade
+  let p1 = `A estrutura analisada conta com ${totalColabs} colaboradores`;
+  if (sector) p1 += ` no setor de ${sector}`;
+  if (revenue) p1 += ` (faturamento: ${revenue})`;
+  p1 += `. São ${managers.length} gestores distribuídos em ${maxLevel} níveis hierárquicos, resultando em um Span of Control médio de ${avgSpan} diretos por gestor.`;
+  if (avg >= 4 && avg <= 9) p1 += ' Este índice está dentro da faixa saudável recomendada para a maioria dos setores (4–9).';
+  else if (avg < 4) p1 += ' Este índice está abaixo da faixa recomendada, sinalizando uma estrutura excessivamente verticalizada.';
+  else p1 += ' Este índice está acima da faixa recomendada, sinalizando potencial sobrecarga dos gestores.';
+  diagnostico.push(p1);
+
+  // Parágrafo 2: desvios
+  if (desvios.length === 0) {
+    diagnostico.push('Não foram identificados desvios estruturais relevantes. A distribuição de subordinados está equilibrada entre os gestores, sem concentração de equipes excessivamente grandes ou reduzidas.');
+  } else {
+    let p2 = `Foram identificados ${desvios.length} desvio(s) estrutural(is): `;
+    const partes = [];
+    if (excessivos.length)  partes.push(`${excessivos.length} span(s) excessivo(s) — gestores com 10 ou mais subordinados diretos, o que eleva o risco de sobrecarga e redução na qualidade da gestão`);
+    if (reduzidos.length)   partes.push(`${reduzidos.length} span(s) reduzido(s) — líderes com apenas 2 ou 3 diretos, sugerindo possível superposição hierárquica`);
+    if (individuais.length) partes.push(`${individuais.length} liderança(s) individual(is) — gestores com um único subordinado, o que raramente justifica uma camada gerencial dedicada`);
+    if (pescocos.length)    partes.push(`${pescocos.length} pescoço(s) de garrafa — cadeias lineares que aumentam latência nas decisões e distorcem a comunicação`);
+    p2 += partes.join('; ') + '.';
+    diagnostico.push(p2);
+  }
+
+  // Parágrafo 3: diversidade de áreas e risco
+  const areas = Object.keys(porArea);
+  let p3 = '';
+  if (areas.length > 1) {
+    const maiorArea = areas.sort((a,b)=>porArea[b]-porArea[a])[0];
+    const pct = Math.round((porArea[maiorArea]/totalColabs)*100);
+    p3 = `A estrutura se distribui entre ${areas.length} área(s). "${maiorArea}" concentra ${pct}% dos colaboradores (${porArea[maiorArea]} pessoas).`;
+    if (pct > 40) p3 += ' Esta concentração pode indicar dependência operacional excessiva de uma única área.';
+    else p3 += ' A distribuição sugere diversificação razoável de capacidade entre as áreas.';
+  } else {
+    p3 = `Todos os colaboradores estão alocados em uma única área funcional, o que limita a análise de desequilíbrios interdepartamentais.`;
+  }
+  if (maxLevel >= 6) p3 += ` A profundidade de ${maxLevel} níveis hierárquicos é elevada e pode aumentar a burocracia e o tempo de resposta organizacional.`;
+  diagnostico.push(p3);
+
+  // ── INTERVENÇÕES ──
+  const intervencoes = [];
+
+  if (excessivos.length > 0) {
+    const nomes = excessivos.slice(0,3).map(d=>d.pessoa.nome.split(' ')[0]).join(', ');
+    intervencoes.push(`Revisar o escopo dos gestores com span excessivo (${nomes}${excessivos.length>3?', entre outros':''}) — avaliar criação de camada de coordenação intermediária ou redistribuição de equipes.`);
+  }
+
+  if (individuais.length > 0 || pescocos.length > 0) {
+    intervencoes.push(`Eliminar ou consolidar camadas de liderança individual e pescoços de garrafa (${individuais.length + pescocos.length} casos). Gestores com apenas 1 direto devem ter seu escopo ampliado ou a posição reclassificada como contribuidor individual sênior.`);
+  }
+
+  if (avg < 4) {
+    intervencoes.push(`Aumentar o Span of Control médio (atual: ${avgSpan}) aproximando-o da faixa de 5–8. Considerar a fusão de equipes pequenas e a eliminação de níveis gerenciais intermediários desnecessários.`);
+  } else if (avg > 9) {
+    intervencoes.push(`Reduzir o Span of Control médio (atual: ${avgSpan}) por meio da criação de novas posições de liderança de equipe, evitando sobrecarga e perda de qualidade no acompanhamento dos colaboradores.`);
+  }
+
+  if (maxLevel >= 6) {
+    intervencoes.push(`Reduzir a profundidade hierárquica de ${maxLevel} para no máximo 5 níveis. Estruturas muito verticais aumentam latência decisória e dificultam a comunicação estratégica.`);
+  }
+
+  if (reduzidos.length > 0) {
+    intervencoes.push(`Reavaliar as ${reduzidos.length} equipe(s) com span reduzido — considerar fusão de times pequenos ou reposicionamento dos líderes em papéis de maior amplitude.`);
+  }
+
+  // Sempre: revisão periódica
+  intervencoes.push(`Implementar revisão de design organizacional semestral com análise de span, camadas e desvios estruturais — especialmente em momentos de crescimento acelerado ou reestruturação.`);
+
+  return { diagnostico, intervencoes };
+}
+
+// ─── BENCHMARKS ─────────────────────────────────────────────────────────────
 const BENCHMARKS = {
-  varejo:     { nome:'Varejo',             avgSpan:'6–10', niveis:'4–5', mgmtRatio:'1:8–12', cor:'#3a6351', desc:'Varejistas tendem a estruturas achatadas com alto span, especialmente no nível de loja. Gerentes de loja frequentemente lideram 8–15 colaboradores. Corporativo costuma ter 4 níveis (CEO → VP → Gerente → Analista).' },
-  logistica:  { nome:'Logística',          avgSpan:'6–12', niveis:'4–6', mgmtRatio:'1:8–15', cor:'#c8401a', desc:'Operações logísticas apresentam alto span no chão de operações (supervisores de turno com 10–20 pessoas). No corporativo o span cai para 5–8. Estruturas regionais com camadas de coordenação são comuns.' },
-  tech:       { nome:'Tecnologia',         avgSpan:'5–8',  niveis:'4–6', mgmtRatio:'1:5–8',  cor:'#1e40af', desc:'Tech companies equilibram autonomia e especialização. Spans menores em P&D (3–6) e maiores em suporte/ops (8–12). Estruturas matriciais são comuns.' },
-  financeiro: { nome:'Financeiro/Banco',   avgSpan:'4–7',  niveis:'5–7', mgmtRatio:'1:5–7',  cor:'#92400e', desc:'Bancos e fintechs possuem hierarquias mais verticais por compliance e risco. Spans menores nas áreas regulatórias, maiores no atendimento ao cliente.' },
-  industria:  { nome:'Indústria/Manufatura', avgSpan:'6–12', niveis:'5–6', mgmtRatio:'1:8–15', cor:'#6b21a8', desc:'No chão de fábrica spans chegam a 15–20. Na área administrativa, 5–8. Líderes de turno têm spans maiores que gestores corporativos.' },
-  saude:      { nome:'Saúde',              avgSpan:'4–8',  niveis:'4–6', mgmtRatio:'1:5–8',  cor:'#0e7490', desc:'Hospitais e clínicas equilibram especialização técnica com gestão de equipes. Coordenadores de enfermagem podem ter spans de 10–15, médicos geralmente menos.' },
+  logistica:  { nome:'Logística',             avgSpan:'6–12', niveis:'4–6', ratio:'1:8–15', cor:'#8b0042', desc:'Operações logísticas apresentam alto span no chão de operações (supervisores de turno com 10–20 pessoas). No corporativo o span cai para 5–8. Estruturas regionais com camadas de coordenação são comuns.' },
+  varejo:     { nome:'Varejo',                avgSpan:'6–10', niveis:'4–5', ratio:'1:8–12', cor:'#6b0032', desc:'Varejistas tendem a estruturas achatadas com alto span, especialmente no nível de loja. Gerentes de loja frequentemente lideram 8–15 colaboradores. Corporativo costuma ter 4 níveis.' },
+  tech:       { nome:'Tecnologia',            avgSpan:'5–8',  niveis:'4–6', ratio:'1:5–8',  cor:'#1a3a8f', desc:'Tech companies equilibram autonomia e especialização. Spans menores em P&D (3–6) e maiores em suporte/ops (8–12). Estruturas matriciais são comuns.' },
+  financeiro: { nome:'Financeiro / Banco',    avgSpan:'4–7',  niveis:'5–7', ratio:'1:5–7',  cor:'#4a3800', desc:'Bancos e fintechs possuem hierarquias mais verticais por compliance e risco. Spans menores nas áreas regulatórias, maiores no atendimento ao cliente.' },
+  industria:  { nome:'Indústria / Manufatura',avgSpan:'6–12', niveis:'5–6', ratio:'1:8–15', cor:'#3b1a6b', desc:'No chão de fábrica spans chegam a 15–20. Na área administrativa 5–8. Líderes de turno têm spans maiores que gestores corporativos.' },
+  saude:      { nome:'Saúde',                 avgSpan:'4–8',  niveis:'4–6', ratio:'1:5–8',  cor:'#004d40', desc:'Hospitais e clínicas equilibram especialização técnica com gestão de equipes. Coordenadores de enfermagem podem ter spans de 10–15, médicos geralmente menos.' },
 };
 
-// ── APP ───────────────────────────────────────────────────────────────────────
+// ─── APP ─────────────────────────────────────────────────────────────────────
 function App() {
-  const [data, setData]         = useState(null);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [dragging, setDragging] = useState(false);
-  const [aiText, setAiText]     = useState('');
-  const [aiLoading, setAiLoading] = useState(false);
-  const [sector, setSector]     = useState('');
-  const [revenue, setRevenue]   = useState('');
+  const [data, setData]           = useState(null);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [dragging, setDragging]   = useState(false);
+  const [fileName, setFileName]   = useState('');
+  const [sector, setSector]       = useState('');
+  const [revenue, setRevenue]     = useState('');
   const [benchmark, setBenchmark] = useState('logistica');
-  const [fileName, setFileName] = useState('');
+  const [diagData, setDiagData]   = useState(null);
   const fileRef = useRef();
 
   const processFile = useCallback(async (file) => {
-    setLoading(true); setError(''); setData(null); setAiText(''); setFileName(file.name);
+    setLoading(true); setError(''); setData(null); setDiagData(null); setFileName(file.name);
     try {
       const name = file.name.toLowerCase();
       let rows;
-      if (name.endsWith('.csv')) {
-        rows = parseCSV(await file.text());
-      } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-        rows = parseXLSX(new Uint8Array(await file.arrayBuffer()));
-      } else {
-        throw new Error('Formato não suportado. Use .csv ou .xlsx');
-      }
+      if (name.endsWith('.csv'))                    rows = parseCSV(await file.text());
+      else if (name.endsWith('.xlsx')||name.endsWith('.xls')) rows = parseXLSX(new Uint8Array(await file.arrayBuffer()));
+      else throw new Error('Formato não suportado. Use .csv ou .xlsx');
       if (!rows.length) throw new Error('Arquivo vazio ou colunas não reconhecidas.');
       setData(analyzeOrg(rows));
-    } catch(e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch(e) { setError(e.message); }
+    finally { setLoading(false); }
   }, []);
 
   const onDrop = useCallback(e => {
     e.preventDefault(); setDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
+    const f = e.dataTransfer.files[0]; if (f) processFile(f);
   }, [processFile]);
 
-  const callClaude = useCallback(async () => {
+  const handleDiagnostico = useCallback(() => {
     if (!data) return;
-    setAiLoading(true); setAiText('');
-    const desvioResume = data.desvios.slice(0,20).map(d =>
-      `- ${d.tipo.toUpperCase()}: ${d.pessoa.nome} (${d.pessoa.cargo}) — ${d.desc}`
-    ).join('\n');
-    const ctx = [sector && `Setor: ${sector}`, revenue && `Faturamento: ${revenue}`].filter(Boolean).join('. ');
-    const prompt = `Você é um especialista sênior em design organizacional. Analise a estrutura abaixo e responda em português com dois blocos: "DIAGNÓSTICO:" (3 parágrafos sobre saúde estrutural, riscos e pontos positivos) e "INTERVENÇÕES RECOMENDADAS:" (4 a 6 ações concretas e prioritárias, numeradas). Seja direto e prático.\n\n${ctx ? ctx + '\n' : ''}Total de colaboradores: ${data.totalColabs}\nSpan of Control médio: ${data.avgSpan}\nNúmero de gestores identificados: ${data.managers.length}\nNíveis hierárquicos: ${data.maxLevel}\nTotal de desvios: ${data.desvios.length}\nDesvios (amostra):\n${desvioResume || 'Nenhum desvio crítico.'}\nDistribuição por área: ${JSON.stringify(data.porArea)}`;
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          messages:[{ role:'user', content:prompt }]
-        })
-      });
-      const json = await res.json();
-      setAiText((json.content||[]).map(c=>c.text||'').join('') || 'Sem resposta.');
-    } catch(e) {
-      setAiText('Erro ao conectar com a IA.');
-    } finally {
-      setAiLoading(false);
-    }
+    setDiagData(gerarDiagnostico(data, sector, revenue));
   }, [data, sector, revenue]);
 
+  const bm = BENCHMARKS[benchmark] || BENCHMARKS.logistica;
   const tagMap = {
-    pescoço:    { label:'Pescoço de Garrafa', cls:'tag-pescoço' },
-    excessivo:  { label:'Span Excessivo',     cls:'tag-excessivo' },
-    reduzido:   { label:'Span Reduzido',      cls:'tag-reduzido' },
-    individual: { label:'Liderança Individual',cls:'tag-individual' },
+    pescoço:    { label:'Pescoço de Garrafa',  cls:'tag-pescoço' },
+    excessivo:  { label:'Span Excessivo',       cls:'tag-excessivo' },
+    reduzido:   { label:'Span Reduzido',        cls:'tag-reduzido' },
+    individual: { label:'Liderança Individual', cls:'tag-individual' },
   };
 
-  const bm = BENCHMARKS[benchmark] || BENCHMARKS.logistica;
-
   return (
-    <div className="min-h-screen" style={{background:'#f5f1eb'}}>
-      {/* Header */}
-      <div style={{background:'#0f0f0f'}} className="px-6 py-5 flex items-center justify-between">
+    <>
+      {/* HEADER */}
+      <div className="app-header">
         <div>
-          <div className="text-xs font-display tracking-widest uppercase mb-1" style={{color:'#c8401a'}}>Ferramenta</div>
-          <h1 className="font-display text-2xl font-bold text-white tracking-tight">Calculadora de Design Organizacional</h1>
+          <div className="sub">Ferramenta</div>
+          <h1>Calculadora de Design Organizacional</h1>
         </div>
-        <div className="text-xs text-gray-500 font-body hidden md:block">Powered by Claude · Anthropic</div>
+        <div className="badge-powered">Design Org · v3</div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+      <div className="container">
+        <div className="stack">
 
-        {/* Upload */}
-        <div className="card">
-          <div className="section-label">Passo 1 — Carregue sua estrutura</div>
-          <div
-            className={`upload-zone rounded-xl p-8 text-center cursor-pointer ${dragging?'drag-over':''}`}
-            onDragOver={e=>{e.preventDefault();setDragging(true)}}
-            onDragLeave={()=>setDragging(false)}
-            onDrop={onDrop}
-            onClick={()=>fileRef.current.click()}
-          >
-            <div className="text-4xl mb-3">{fileName ? '✅' : '📂'}</div>
-            <div className="font-display font-semibold text-lg mb-1">
-              {fileName ? fileName : 'Arraste seu arquivo aqui'}
+          {/* ── UPLOAD ── */}
+          <div className="card">
+            <div className="slabel">Passo 1 — Carregue sua estrutura</div>
+            <div
+              className={`upload-zone${dragging?' drag-over':''}`}
+              onDragOver={e=>{e.preventDefault();setDragging(true)}}
+              onDragLeave={()=>setDragging(false)}
+              onDrop={onDrop}
+              onClick={()=>fileRef.current.click()}
+            >
+              <div className="icon">{fileName?'✅':'📂'}</div>
+              <div className="title">{fileName||'Arraste seu arquivo aqui'}</div>
+              <div className="hint" style={{marginBottom:6}}>Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong></div>
+              <div className="hint">Colunas esperadas: <code>id · nome · cargo · area · gestor</code></div>
+              <div className="hint" style={{marginTop:4}}>A coluna <strong>gestor</strong> aceita o <em>nome</em> ou o <em>ID</em> do gestor direto.</div>
+              <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" style={{display:'none'}}
+                onChange={e=>e.target.files[0]&&processFile(e.target.files[0])} />
             </div>
-            <div className="text-sm text-gray-500 mb-2">Formatos aceitos: <strong>.csv</strong> ou <strong>.xlsx</strong></div>
-            <div className="text-xs text-gray-400">
-              Colunas esperadas: <code className="bg-gray-100 px-1 rounded">id · nome · cargo · area · gestor</code>
-            </div>
-            <div className="text-xs text-gray-400 mt-1">
-              A coluna <strong>gestor</strong> pode conter o <em>nome</em> ou o <em>ID</em> do gestor direto.
-            </div>
-            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden"
-              onChange={e=>e.target.files[0]&&processFile(e.target.files[0])} />
-          </div>
-          <div className="mt-3 flex items-center gap-3 flex-wrap">
-            <button onClick={downloadTemplate}
-              className="text-xs font-display font-semibold underline underline-offset-2 flex items-center gap-1"
-              style={{color:'#c8401a'}}>
-              ⬇ Baixar arquivo modelo
-            </button>
-            <span className="text-gray-300">|</span>
-            <span className="text-xs text-gray-400">Todos os dados são processados localmente no seu navegador.</span>
-          </div>
-        </div>
-
-        {/* Contexto opcional */}
-        <div className="card">
-          <div className="section-label">Passo 2 — Contexto opcional (refina a análise de IA)</div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Setor da empresa</label>
-              <select value={sector} onChange={e=>setSector(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                <option value="">Selecione...</option>
-                <option value="logística">Logística</option>
-                <option value="varejo">Varejo</option>
-                <option value="tecnologia">Tecnologia</option>
-                <option value="financeiro">Financeiro / Banco</option>
-                <option value="indústria">Indústria / Manufatura</option>
-                <option value="saúde">Saúde</option>
-                <option value="educação">Educação</option>
-                <option value="outros">Outros</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Faixa de faturamento</label>
-              <select value={revenue} onChange={e=>setRevenue(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                <option value="">Selecione...</option>
-                <option value="startup (< R$ 10M)">Startup (&lt; R$ 10M)</option>
-                <option value="pequeno porte (R$ 10M–50M)">Pequeno porte (R$ 10–50M)</option>
-                <option value="médio porte (R$ 50M–500M)">Médio porte (R$ 50–500M)</option>
-                <option value="grande porte (R$ 500M–2B)">Grande porte (R$ 500M–2B)</option>
-                <option value="enterprise (> R$ 2B)">Enterprise (&gt; R$ 2B)</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Benchmark de referência</label>
-              <select value={benchmark} onChange={e=>setBenchmark(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                {Object.entries(BENCHMARKS).map(([k,v])=>(
-                  <option key={k} value={k}>{v.nome}</option>
-                ))}
-              </select>
+            <div style={{marginTop:12,display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+              <button className="btn-ghost" onClick={downloadTemplate}>⬇ Baixar arquivo modelo</button>
+              <span style={{color:'var(--border)'}}>|</span>
+              <span style={{fontSize:11,color:'var(--text-faint)'}}>Dados processados 100% no navegador — nenhuma informação é enviada a servidores.</span>
             </div>
           </div>
-        </div>
 
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="spinner"></div>
-            <span className="ml-4 font-body text-gray-500">Processando estrutura...</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-body">
-            ⚠️ {error}
-          </div>
-        )}
-
-        {data && (
-          <div className="space-y-6 fade-in">
-
-            {/* Resumo Executivo */}
-            <div>
-              <div className="section-label">Resumo Executivo</div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { val: data.totalColabs,     label: 'Colaboradores' },
-                  { val: data.avgSpan,          label: 'Span médio' },
-                  { val: data.managers.length,  label: 'Gestores' },
-                  { val: data.maxLevel,         label: 'Níveis hierárq.' },
-                ].map((m,i)=>(
-                  <div key={i} className="card text-center">
-                    <div className="metric-big">{m.val}</div>
-                    <div className="metric-label">{m.label}</div>
-                  </div>
-                ))}
+          {/* ── CONTEXTO ── */}
+          <div className="card">
+            <div className="slabel">Passo 2 — Contexto opcional (refina o diagnóstico)</div>
+            <div className="grid-3">
+              <div className="field">
+                <label>Setor da empresa</label>
+                <select value={sector} onChange={e=>setSector(e.target.value)}>
+                  <option value="">Selecione...</option>
+                  <option value="Logística">Logística</option>
+                  <option value="Varejo">Varejo</option>
+                  <option value="Tecnologia">Tecnologia</option>
+                  <option value="Financeiro / Banco">Financeiro / Banco</option>
+                  <option value="Indústria / Manufatura">Indústria / Manufatura</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Educação">Educação</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div className="field">
+                <label>Faixa de faturamento</label>
+                <select value={revenue} onChange={e=>setRevenue(e.target.value)}>
+                  <option value="">Selecione...</option>
+                  <option value="Startup (< R$ 10M)">Startup (&lt; R$ 10M)</option>
+                  <option value="Pequeno porte (R$ 10–50M)">Pequeno porte (R$ 10–50M)</option>
+                  <option value="Médio porte (R$ 50–500M)">Médio porte (R$ 50–500M)</option>
+                  <option value="Grande porte (R$ 500M–2B)">Grande porte (R$ 500M–2B)</option>
+                  <option value="Enterprise (> R$ 2B)">Enterprise (&gt; R$ 2B)</option>
+                </select>
+              </div>
+              <div className="field">
+                <label>Benchmark de referência</label>
+                <select value={benchmark} onChange={e=>setBenchmark(e.target.value)}>
+                  {Object.entries(BENCHMARKS).map(([k,v])=>(
+                    <option key={k} value={k}>{v.nome}</option>
+                  ))}
+                </select>
               </div>
             </div>
+          </div>
 
-            {/* Tabela spans */}
-            <div className="card">
-              <div className="section-label">Span of Control por Gestor</div>
-              <div className="overflow-x-auto">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Gestor</th>
-                      <th>Cargo</th>
-                      <th>Área</th>
-                      <th>Diretos</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.spans.sort((a,b)=>b.span-a.span).map(p=>{
-                      let status, cls;
-                      if (p.span>=10)           { status='Excessivo'; cls='tag-excessivo'; }
-                      else if (p.span>=4)       { status='Adequado';  cls='tag-ok'; }
-                      else if (p.span>=2)       { status='Reduzido';  cls='tag-reduzido'; }
-                      else                      { status='Individual';cls='tag-individual'; }
-                      const barColor = p.span>=10 ? '#d97706' : p.span<=1 ? '#7c3aed' : '#3a6351';
-                      return (
-                        <tr key={p.id}>
-                          <td>
-                            <div className="font-medium">{p.nome}</div>
-                            <div className="text-xs text-gray-400">ID {p.id}</div>
-                          </td>
-                          <td className="text-gray-600">{p.cargo||'—'}</td>
-                          <td className="text-gray-500 max-w-xs truncate" title={p.area}>{p.area||'—'}</td>
-                          <td>
-                            <div className="flex items-center gap-2">
-                              <span className="font-display font-bold">{p.span}</span>
-                              <div className="flex-1 bg-gray-100 rounded h-2 min-w-12">
-                                <div className="bar-fill rounded"
-                                  style={{width:`${Math.min(100,p.span/15*100)}%`,background:barColor}}></div>
-                              </div>
-                            </div>
-                          </td>
-                          <td><span className={`tag ${cls}`}>{status}</span></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+          {loading && (
+            <div style={{display:'flex',alignItems:'center',gap:14,padding:'32px 0'}}>
+              <div className="spinner"></div>
+              <span style={{color:'var(--text-muted)',fontSize:14}}>Processando estrutura...</span>
             </div>
+          )}
 
-            {/* Desvios */}
-            <div className="card">
-              <div className="section-label">Desvios Estruturais ({data.desvios.length})</div>
-              {data.desvios.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <div className="text-3xl mb-2">✅</div>
-                  <div className="font-display font-semibold">Nenhum desvio crítico identificado</div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {data.desvios.map((d,i)=>{
-                    const t = tagMap[d.tipo]||{ label:d.tipo, cls:'tag-ok' };
-                    return (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg"
-                        style={{background:'#faf8f5',borderLeft:'3px solid #e5e0d8'}}>
-                        <span className={`tag ${t.cls} mt-0.5 shrink-0`}>{t.label}</span>
-                        <div>
-                          <div className="font-medium text-sm">{d.pessoa.nome}</div>
-                          <div className="text-xs text-gray-500">{d.pessoa.cargo||'—'} · {d.pessoa.area||'—'} · {d.desc}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+          {error && <div className="error-box">⚠️ {error}</div>}
 
-            {/* Benchmark */}
-            <div className="card">
-              <div className="section-label">Benchmark — {bm.nome}</div>
-              <div className="grid md:grid-cols-3 gap-4 mb-4">
-                {[
-                  { label:'Span médio de referência',      val:bm.avgSpan },
-                  { label:'Níveis hierárquicos típicos',   val:bm.niveis },
-                  { label:'Proporção gestores:liderados',  val:bm.mgmtRatio },
-                ].map((m,i)=>(
-                  <div key={i} className="rounded-xl p-4 text-center" style={{background:'#f5f1eb'}}>
-                    <div className="font-display font-bold text-2xl" style={{color:bm.cor}}>{m.val}</div>
-                    <div className="text-xs text-gray-500 mt-1">{m.label}</div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">{bm.desc}</p>
-              <div className="mt-4 p-3 rounded-lg border" style={{borderColor:bm.cor+'40',background:bm.cor+'08'}}>
-                <div className="text-xs font-display font-bold uppercase tracking-wide mb-1" style={{color:bm.cor}}>
-                  Comparação com sua estrutura
-                </div>
-                <div className="text-sm text-gray-700">
-                  Span médio atual: <strong>{data.avgSpan}</strong> · Benchmark {bm.nome}: <strong>{bm.avgSpan}</strong>.{' '}
-                  {(() => {
-                    const avg = parseFloat(data.avgSpan);
-                    const [lo,hi] = bm.avgSpan.split('–').map(Number);
-                    if (avg > hi) return 'Sua estrutura está mais achatada que o benchmark — avalie sobrecarga dos gestores.';
-                    if (avg < lo) return 'Sua estrutura está mais verticalizada que o benchmark — considere reduzir camadas.';
-                    return 'Span alinhado com o benchmark do setor. ✓';
-                  })()}
-                </div>
-              </div>
-            </div>
+          {data && (
+            <div className="stack fade-in">
 
-            {/* IA */}
-            <div>
-              <div className="section-label">Diagnóstico IA + Sugestões de Intervenção</div>
-              {!aiText && !aiLoading && (
-                <div className="card flex flex-col items-center py-8 text-center">
-                  <div className="text-3xl mb-3">🤖</div>
-                  <div className="font-display font-semibold text-lg mb-1">Análise por Inteligência Artificial</div>
-                  <div className="text-sm text-gray-500 mb-5 max-w-md">
-                    Diagnóstico executivo e intervenções geradas pelo Claude com base em todos os dados analisados
-                    {sector ? ` (contexto: ${sector})` : ''}.
-                  </div>
-                  <button onClick={callClaude}
-                    className="px-6 py-3 rounded-xl font-display font-bold text-white text-sm tracking-wide"
-                    style={{background:'#0f0f0f'}}>
-                    Gerar Diagnóstico com IA →
-                  </button>
-                </div>
-              )}
-              {aiLoading && (
-                <div className="ai-block flex items-center gap-4">
-                  <div className="spinner" style={{borderTopColor:'#c8401a',borderColor:'#333'}}></div>
-                  <div className="text-sm" style={{color:'#a0a0a0'}}>Analisando estrutura com Claude...</div>
-                </div>
-              )}
-              {aiText && !aiLoading && (
-                <div className="ai-block">
-                  <div className="text-xs font-display tracking-widest uppercase mb-4" style={{color:'#c8401a'}}>
-                    Análise Claude · {sector ? sector.toUpperCase() : 'ESTRUTURA GERAL'}
-                  </div>
-                  <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{color:'#e8e3db'}}>
-                    {aiText}
-                  </div>
-                  <button onClick={callClaude}
-                    className="mt-5 text-xs underline underline-offset-2" style={{color:'#c8401a'}}>
-                    Regenerar análise
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Distribuição por área */}
-            {Object.keys(data.porArea).length > 0 && (
-              <div className="card">
-                <div className="section-label">Distribuição por Área</div>
-                <div className="space-y-2">
-                  {Object.entries(data.porArea).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([area,n])=>(
-                    <div key={area} className="flex items-center gap-3">
-                      <div className="text-sm font-medium w-48 shrink-0 truncate" title={area}>{area}</div>
-                      <div className="flex-1 bg-gray-100 rounded-full h-2">
-                        <div className="bar-fill rounded-full" style={{
-                          width:`${(n/data.totalColabs)*100}%`,
-                          background:'#0f0f0f'
-                        }}></div>
-                      </div>
-                      <div className="text-xs text-gray-500 w-10 text-right">{n}</div>
+              {/* ── RESUMO EXECUTIVO ── */}
+              <div>
+                <div className="slabel">Resumo Executivo</div>
+                <div className="grid-4">
+                  {[
+                    { val:data.totalColabs,    lbl:'Colaboradores' },
+                    { val:data.avgSpan,        lbl:'Span médio' },
+                    { val:data.managers.length,lbl:'Gestores' },
+                    { val:data.maxLevel,       lbl:'Níveis hierárq.' },
+                  ].map((m,i)=>(
+                    <div key={i} className="metric-card">
+                      <div className="metric-val">{m.val}</div>
+                      <div className="metric-lbl">{m.lbl}</div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
 
+              {/* ── SPAN TABLE ── */}
+              <div className="card">
+                <div className="slabel">Span of Control por Gestor</div>
+                <div className="overflow-x">
+                  <table className="tbl">
+                    <thead>
+                      <tr>
+                        <th>Gestor</th><th>Cargo</th><th>Área</th><th>Diretos</th><th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.spans.sort((a,b)=>b.span-a.span).map(p=>{
+                        let status, cls;
+                        if      (p.span>=10)       { status='Excessivo'; cls='tag-excessivo'; }
+                        else if (p.span>=4)        { status='Adequado';  cls='tag-ok'; }
+                        else if (p.span>=2)        { status='Reduzido';  cls='tag-reduzido'; }
+                        else                       { status='Individual';cls='tag-individual'; }
+                        const cor = p.span>=10?'#e65100':p.span<=1?'#880e4f':'#2e7d32';
+                        return (
+                          <tr key={p.id}>
+                            <td>
+                              <div className="name">{p.nome}</div>
+                              <div className="sub">ID {p.id}</div>
+                            </td>
+                            <td style={{color:'var(--text-muted)'}}>{p.cargo||'—'}</td>
+                            <td style={{maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--text-faint)'}} title={p.area}>{p.area||'—'}</td>
+                            <td>
+                              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                                <span style={{fontWeight:700,color:'var(--rose-dark)',minWidth:20}}>{p.span}</span>
+                                <div className="bar-track">
+                                  <div className="bar-fill" style={{width:`${Math.min(100,p.span/15*100)}%`,background:cor}}></div>
+                                </div>
+                              </div>
+                            </td>
+                            <td><span className={`tag ${cls}`}>{status}</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── DESVIOS ── */}
+              <div className="card">
+                <div className="slabel">Desvios Estruturais ({data.desvios.length})</div>
+                {data.desvios.length===0 ? (
+                  <div style={{textAlign:'center',padding:'32px 0',color:'var(--text-muted)'}}>
+                    <div style={{fontSize:32,marginBottom:8}}>✅</div>
+                    <div style={{fontWeight:700}}>Nenhum desvio crítico identificado</div>
+                  </div>
+                ) : (
+                  <div className="stack" style={{gap:8}}>
+                    {data.desvios.map((d,i)=>{
+                      const t = tagMap[d.tipo]||{label:d.tipo,cls:'tag-ok'};
+                      return (
+                        <div key={i} className="desvio-row">
+                          <span className={`tag ${t.cls}`} style={{marginTop:2,flexShrink:0}}>{t.label}</span>
+                          <div>
+                            <div className="nome">{d.pessoa.nome}</div>
+                            <div className="desc">{d.pessoa.cargo||'—'} · {d.pessoa.area||'—'} · {d.desc}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* ── BENCHMARK ── */}
+              <div className="card">
+                <div className="slabel">Benchmark — {bm.nome}</div>
+                <div className="grid-3" style={{marginBottom:16}}>
+                  {[
+                    { val:bm.avgSpan, lbl:'Span médio de referência' },
+                    { val:bm.niveis,  lbl:'Níveis hierárquicos típicos' },
+                    { val:bm.ratio,   lbl:'Proporção gestores:liderados' },
+                  ].map((m,i)=>(
+                    <div key={i} className="bench-stat">
+                      <div className="val" style={{color:bm.cor}}>{m.val}</div>
+                      <div className="lbl">{m.lbl}</div>
+                    </div>
+                  ))}
+                </div>
+                <p style={{fontSize:13,color:'var(--text-muted)',lineHeight:1.6,marginBottom:12}}>{bm.desc}</p>
+                <div style={{background:'var(--rose-faint)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px'}}>
+                  <div style={{fontSize:10,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:bm.cor,marginBottom:5}}>
+                    Comparação com sua estrutura
+                  </div>
+                  <div style={{fontSize:13,color:'var(--text-main)'}}>
+                    {(()=>{
+                      const avg = parseFloat(data.avgSpan);
+                      const [lo,hi] = bm.avgSpan.split('–').map(Number);
+                      const estado = avg>hi ? 'está acima do benchmark — avalie sobrecarga dos gestores' :
+                                     avg<lo ? 'está abaixo do benchmark — considere reduzir camadas hierárquicas' :
+                                              'está alinhado com o benchmark do setor ✓';
+                      return `Span médio atual: ${data.avgSpan} · Referência ${bm.nome}: ${bm.avgSpan} · Sua estrutura ${estado}.`;
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── DIAGNÓSTICO LOCAL ── */}
+              <div>
+                <div className="slabel">Diagnóstico + Intervenções Recomendadas</div>
+                {!diagData ? (
+                  <div className="card" style={{textAlign:'center',padding:'36px 24px'}}>
+                    <div style={{fontSize:32,marginBottom:10}}>📋</div>
+                    <div style={{fontWeight:700,fontSize:16,marginBottom:6}}>Gerar Diagnóstico Estrutural</div>
+                    <div style={{fontSize:13,color:'var(--text-muted)',marginBottom:20,maxWidth:440,margin:'0 auto 20px'}}>
+                      Análise gerada localmente com base nos desvios e métricas identificados
+                      {sector ? ` para o setor de ${sector}` : ''}.
+                    </div>
+                    <button className="btn" onClick={handleDiagnostico}>
+                      Gerar Diagnóstico →
+                    </button>
+                  </div>
+                ) : (
+                  <div className="card-dark fade-in">
+                    <div className="diag-section">
+                      <h3>Diagnóstico da Estrutura</h3>
+                      {diagData.diagnostico.map((txt,i)=>(
+                        <div key={i} className="diag-item">
+                          <div className="diag-bullet">{i+1}</div>
+                          <p>{txt}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="divider" style={{background:'rgba(255,255,255,.1)',margin:'18px 0'}}></div>
+                    <div className="diag-section" style={{marginBottom:0}}>
+                      <h3>Intervenções Recomendadas</h3>
+                      {diagData.intervencoes.map((txt,i)=>(
+                        <div key={i} className="diag-item">
+                          <div className="diag-bullet" style={{background:'transparent',border:'1.5px solid var(--rose-vivid)',color:'#f06292'}}>{i+1}</div>
+                          <p>{txt}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{marginTop:18}}>
+                      <button className="btn-ghost" style={{color:'#f06292'}} onClick={handleDiagnostico}>
+                        Regenerar diagnóstico
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ── DISTRIBUIÇÃO POR ÁREA ── */}
+              {Object.keys(data.porArea).length > 1 && (
+                <div className="card">
+                  <div className="slabel">Distribuição por Área</div>
+                  <div className="stack" style={{gap:8}}>
+                    {Object.entries(data.porArea).sort((a,b)=>b[1]-a[1]).slice(0,20).map(([area,n])=>(
+                      <div key={area} className="area-row">
+                        <div className="area-name" title={area}>{area}</div>
+                        <div className="bar-track">
+                          <div className="bar-fill" style={{width:`${(n/data.totalColabs)*100}%`,background:'var(--rose-dark)'}}></div>
+                        </div>
+                        <div className="area-n">{n}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
+          <div style={{textAlign:'center',fontSize:11,color:'var(--text-faint)',paddingTop:8}}>
+            Dados processados localmente · Nenhuma informação é enviada a servidores externose · Experimentos de Maria Alice Jovinski
           </div>
-        )}
 
-        <div className="text-center text-xs text-gray-400 py-4 font-body">
-          Dados processados localmente · Nenhuma informação é enviada ao servidor sem sua ação
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
