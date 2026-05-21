@@ -26,8 +26,8 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['Syne', 'sans-serif'],
-            body: ['DM Sans', 'sans-serif'],
+            display: ['Arial', 'sans-serif'],
+            body: ['Arial', 'sans-serif'],
           },
           colors: {
             ink: '#0f0f0f',
@@ -45,12 +45,12 @@
   <style>
     * { box-sizing: border-box; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Arial', sans-serif;
       background: #f5f1eb;
       color: #0f0f0f;
       min-height: 100vh;
     }
-    h1, h2, h3, h4, .font-display { font-family: 'Syne', sans-serif; }
+    h1, h2, h3, h4, .font-display { font-family: 'Arial', sans-serif; }
 
     .upload-zone {
       border: 2px dashed #c8401a;
@@ -89,7 +89,7 @@
     }
 
     .section-label {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Arial', sans-serif;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.15em;
@@ -100,7 +100,7 @@
 
     table { border-collapse: collapse; width: 100%; }
     th {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Arial', sans-serif;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -119,7 +119,7 @@
     tr:hover td { background: #faf8f5; }
 
     .metric-big {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Arial', sans-serif;
       font-size: 48px;
       font-weight: 800;
       line-height: 1;
@@ -489,48 +489,7 @@
               </div>
             </div>
 
-            {/* Campos opcionais */}
-            <div className="card">
-              <div className="section-label">Passo 2 — Contexto opcional (refina a análise)</div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Setor da empresa</label>
-                  <select value={sector} onChange={e => setSector(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                    <option value="">Selecione...</option>
-                    <option value="varejo">Varejo</option>
-                    <option value="tecnologia">Tecnologia</option>
-                    <option value="financeiro">Financeiro / Banco</option>
-                    <option value="industria">Indústria / Manufatura</option>
-                    <option value="saude">Saúde</option>
-                    <option value="educacao">Educação</option>
-                    <option value="logistica">Logística</option>
-                    <option value="outros">Outros</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Faixa de faturamento</label>
-                  <select value={revenue} onChange={e => setRevenue(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                    <option value="">Selecione...</option>
-                    <option value="startup">Startup (&lt; R$ 10M)</option>
-                    <option value="pequeno">Pequeno porte (R$ 10M–50M)</option>
-                    <option value="medio">Médio porte (R$ 50M–500M)</option>
-                    <option value="grande">Grande porte (R$ 500M–2B)</option>
-                    <option value="enterprise">Enterprise (&gt; R$ 2B)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-display font-bold tracking-wide uppercase text-gray-500 block mb-1">Benchmark de referência</label>
-                  <select value={benchmark} onChange={e => setBenchmark(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-gray-400">
-                    {Object.entries(BENCHMARKS).map(([k, v]) => (
-                      <option key={k} value={k}>{v.nome}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
+
 
             {loading && (
               <div className="flex items-center justify-center py-12">
@@ -669,7 +628,7 @@
                   </div>
                 </div>
 
-                {/* IA: Diagnóstico + Intervenções */}
+                {/* IA: Diagnóstico + Intervenções
                 <div>
                   <div className="section-label">Diagnóstico IA + Sugestões de Intervenção</div>
                   {!aiText && !aiLoading && (
@@ -707,7 +666,7 @@
                       </button>
                     </div>
                   )}
-                </div>
+                </div>*/}
 
                 {/* Distribuição por área */}
                 {Object.keys(data.porArea).length > 0 && (
